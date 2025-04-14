@@ -1,0 +1,23 @@
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  text-decoration-line: none;
+}
+
+.nav-link p {
+  font-size: 1.5rem;
+  font-weight: 500;
+  font-family: 'Courier New', Courier, monospace;
+
+  transition: color 0.5s ease;
+}
+
+.nav-link p:hover {
+  color: #eacf00;
+}
+
+.nav-link img {
+  height: 24px;
+  width: auto;
+}

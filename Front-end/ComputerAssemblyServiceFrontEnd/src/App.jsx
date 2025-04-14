@@ -1,19 +1,21 @@
 import "./App.css";
-import pcImage from "./assets/pc.png";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import MainPage from "./pages/main/MainPage";
-import AboutUsPage from "./pages/about-us/AboutUsPage";
-import ProductCard from "./components/ProductCard/ProductCard";
 
-function App() {
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import HomePage from "./pages/home/HomePage";
+import StorePage from "./pages/store-page/StorePage";
+import ServicePage from "./pages/service-page/ServicePage";
+import Header from "./components/Header/Header";
+
+export default function App() {
   return (
     <Router>
+      <Header />
       <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/about-us-page" element={<AboutUsPage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/store-page" element={<StorePage />} />
+        <Route path="/service-page" element={<ServicePage />} />
       </Routes>
     </Router>
   );
 }
-
-export default App;

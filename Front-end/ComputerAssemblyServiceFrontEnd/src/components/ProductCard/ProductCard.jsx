@@ -8,7 +8,7 @@ import ramImg from "../../assets/ProductCardPngs/ram-part.svg";
 import hddImg from "../../assets/ProductCardPngs/hdd-part.svg";
 
 //Component imports
-import ProductCharacteristic from "../ProductCharacteristic/ProductCharacteristic";
+import ProductCharacteristic from "./ProductCharacteristic/ProductCharacteristic";
 
 export default function ProductCard({
   title,
