@@ -1,0 +1,56 @@
+//Styles
+import "./ProductCard.css";
+
+//Image imports
+import cpuImg from "../../assets/ProductCardPngs/cpu-part.svg";
+import gpuImg from "../../assets/ProductCardPngs/gpu-part.svg";
+import ramImg from "../../assets/ProductCardPngs/ram-part.svg";
+import hddImg from "../../assets/ProductCardPngs/hdd-part.svg";
+
+//Component imports
+import ProductCharacteristic from "../ProductCharacteristic/ProductCharacteristic";
+
+export default function ProductCard({
+  title,
+  imageUrl,
+  processor,
+  videoCard,
+  memoryType,
+  ram,
+  storage,
+  price,
+}) {
+  const characteristics = [
+    { image: cpuImg, name: "CPU", model: processor },
+    { image: gpuImg, name: "GPU", model: videoCard },
+    { image: ramImg, name: "Memory Type", model: memoryType },
+    { image: ramImg, name: "RAM", model: ram },
+    { image: hddImg, name: "HDD/SSD", model: storage },
+  ];
+
+  return (
+    <div className="product-card">
+      <img src={imageUrl} alt={title} className="product-image" />
+
+      <h2 className="product-title">{title}</h2>
+      <div className="line"></div>
+      <div className="product-specs">
+        {characteristics.map((char, index) => (
+          <ProductCharacteristic
+            key={index}
+            imageUrl={char.image}
+            componentName={char.name}
+            componentModel={char.model}
+          />
+        ))}
+      </div>
+      <div className="line"></div>
+      <div className="product-footer">
+        <div className="product-price">{price} UAH</div>
+        <div className="product-actions">
+          <button>Purchase</button>
+        </div>
+      </div>
+    </div>
+  );
+}
