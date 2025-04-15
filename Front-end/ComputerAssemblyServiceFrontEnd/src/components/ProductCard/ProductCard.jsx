@@ -2,10 +2,10 @@
 import "./ProductCard.css";
 
 //Image imports
-import cpuImg from "../../assets/ProductCardPngs/cpu-part.svg";
-import gpuImg from "../../assets/ProductCardPngs/gpu-part.svg";
-import ramImg from "../../assets/ProductCardPngs/ram-part.svg";
-import hddImg from "../../assets/ProductCardPngs/hdd-part.svg";
+import cpuImg from "../../assets/ProductCardSvgs/cpu-part.svg";
+import gpuImg from "../../assets/ProductCardSvgs/gpu-part.svg";
+import ramImg from "../../assets/ProductCardSvgs/ram-part.svg";
+import hddImg from "../../assets/ProductCardSvgs/hdd-part.svg";
 
 //Component imports
 import ProductCharacteristic from "./ProductCharacteristic/ProductCharacteristic";

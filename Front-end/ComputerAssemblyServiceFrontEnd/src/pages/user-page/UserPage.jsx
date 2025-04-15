@@ -1,9 +1,9 @@
 import Page from "../Page/Page";
 
-export default function ServicePage() {
+export default function UserPage() {
   return (
     <Page>
-      <p>Hello service!</p>
+      <p>Hello user!</p>
     </Page>
   );
 }

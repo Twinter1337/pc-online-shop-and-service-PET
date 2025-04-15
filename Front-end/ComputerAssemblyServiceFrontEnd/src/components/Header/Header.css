@@ -1,11 +1,42 @@
 header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+
   display: flex;
   align-items: center;
-
+  justify-content: space-between;
   padding: 10px;
 
   height: 70px;
   width: 100%;
 
   background-color: #1a1a1a;
+}
+
+.logo {
+  height: 70px;
+}
+
+.nav-continer {
+  display: flex;
+  gap: 30px
+}
+
+.user-account {
+  display: flex;
+  background-color: #00000000;
+  border-style: none;
+  align-items: center;
+  gap: 10px;
+  margin-right: 15px;
+  text-decoration-line: none;
+
+  font-size: 1.1rem;
+  transition: color 0.5s ease;
+}
+
+.user-account:hover {
+  color: #eacf00;
 }

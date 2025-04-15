@@ -1,5 +1,5 @@
 :root {
-  --font-color: #fff;
+  --font-color: #c2c2c2;
   --font-hover-color: #eacf00;
   --font-weight: 500;
 }
@@ -12,6 +12,7 @@
 .characteristic p {
   grid-column: 2/3;
   transition: color 0.2s ease;
+  font-weight: 100;
 }
 
 .characteristic span {
@@ -22,7 +23,7 @@
 
 .characteristic:hover p {
   color: var(--font-hover-color);
-  font-weight: var(--font-weight);
+
 }
 
 .characteristic img {
