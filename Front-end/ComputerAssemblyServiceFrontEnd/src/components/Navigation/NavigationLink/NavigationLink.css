@@ -1,9 +1,33 @@
 .nav-link {
+  text-decoration: none;
   color: #cecece;
+  display: inline;
+}
+
+.nav-content {
   display: flex;
-  align-items: center;
+
   gap: 0.4rem;
-  text-decoration-line: none;
+
+  align-items: center;
+  position: relative;
+  padding-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+.nav-content::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1.5px;
+  width: 0%;
+  background-color: #eacf00;
+  transition: width 0.4s ease;
+}
+
+.nav-link:hover .nav-content::after {
+  width: 100%;
 }
 
 .nav-link p {
@@ -11,13 +35,4 @@
   font-weight: 400;
 
   transition: color 0.5s ease;
-}
-
-.nav-link p:hover {
-  color: #eacf00;
-}
-
-.nav-link img {
-  height: 24px;
-  width: auto;
 }

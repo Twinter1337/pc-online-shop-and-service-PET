@@ -1,12 +1,15 @@
 import "./StorePage.css";
 
+import StoreFilter from "./StoreFilter/StoreFilter";
 import ProductCard from "../../components/ProductCard/ProductCard";
 import { computersData } from "./computers-data.js";
 import Page from "../Page/Page";
+import ScrollToTopButton from "../../components/ScrollToTopButton/ScrolToTopButton.jsx";
 
 export default function StorePage() {
   return (
     <Page>
+      <StoreFilter />
       <div class="products">
         {computersData.map((comp, index) => (
           <ProductCard
@@ -22,6 +25,7 @@ export default function StorePage() {
           />
         ))}
       </div>
+      <ScrollToTopButton />
     </Page>
   );
 }
