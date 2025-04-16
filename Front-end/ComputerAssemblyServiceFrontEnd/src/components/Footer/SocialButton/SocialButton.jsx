@@ -1,9 +1,9 @@
 import "./SocialButton.css";
 
-export default function SocialButton({ icon, title }) {
+export default function SocialButton({ icon, title, socialUrl }) {
   return (
-    <button class="social-button">
+    <a class="social-button" href={socialUrl} target="_blank">
       <img src={icon} alt={title} />
-    </button>
+    </a>
   );
 }
