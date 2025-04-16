@@ -201,6 +201,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.base_price).HasPrecision(10, 2);
             entity.Property(e => e.manufacturer).HasMaxLength(50);
             entity.Property(e => e.prebuild_name).HasMaxLength(50);
+            entity.Property(e => e.img_url).HasMaxLength(2048);
         });
 
         modelBuilder.Entity<products>(entity =>

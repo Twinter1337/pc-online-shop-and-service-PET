@@ -12,6 +12,8 @@ public partial class prebuild_patterns
     public string manufacturer { get; set; } = null!;
 
     public string description { get; set; } = null!;
+    
+    public string img_url { get; set; } = null!;
 
     public decimal base_price { get; set; }
 
