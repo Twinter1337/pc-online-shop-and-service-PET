@@ -1,0 +1,18 @@
+﻿using ComputerAssemblyServiceBackEnd.Enums.Models;
+
+namespace ComputerAssemblyServiceBackEnd.Models;
+
+public partial class Payment
+{
+    public int PaymentId { get; set; }
+
+    public decimal Amount { get; set; }
+
+    public int OrderId { get; set; }
+    
+    public PaymentStatus Status { get; set; }
+    
+    public PaymentMethod Method { get; set; }
+
+    public virtual Order Order { get; set; } = null!;
+}
