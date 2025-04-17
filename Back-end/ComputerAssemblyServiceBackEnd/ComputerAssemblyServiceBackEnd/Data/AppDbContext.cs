@@ -1,5 +1,8 @@
-﻿using ComputerAssemblyServiceBackEnd.Models;
+﻿using ComputerAssemblyServiceBackEnd.Enums.Models;
+using ComputerAssemblyServiceBackEnd.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql;
 
 namespace ComputerAssemblyServiceBackEnd.Data;
 
@@ -41,9 +44,25 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<users> users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Database=db_course_work;Username=twinter;Password=koksaer123");
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=localhost;Port=5432;Database=db_course_work;Username=twinter;Password=koksaer123");
 
+            dataSourceBuilder.MapEnum<Component_type>("component_type");
+            dataSourceBuilder.MapEnum<Order_status>("order_status");
+            dataSourceBuilder.MapEnum<Payment_method>("payment_method");
+            dataSourceBuilder.MapEnum<Payment_status>("payment_status");
+            dataSourceBuilder.MapEnum<Product_type>("product_type");
+            dataSourceBuilder.MapEnum<Service_status>("service_status");
+            dataSourceBuilder.MapEnum<User_role>("user_role");
+
+            dataSourceBuilder.EnableUnmappedTypes();
+            var dataSource = dataSourceBuilder.Build();
+
+            optionsBuilder.UseNpgsql(dataSource);
+        }
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -54,7 +73,7 @@ public partial class AppDbContext : DbContext
             .HasPostgresEnum("product_type", new[] { "Computer", "Component" }) 
             .HasPostgresEnum("service_status", new[] { "New", "In progress", "Done", "Closed", "Cancelled", "Faild" }) 
             .HasPostgresEnum("user_role", new[] { "Client", "Manager", "Service Worker" }); 
-
+        
         modelBuilder.Entity<components>(entity =>
         {
             entity.HasKey(e => e.component_id).HasName("components_pkey");
@@ -63,7 +82,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.model).HasMaxLength(50);
             entity.Property(e => e.price).HasPrecision(10, 2);
             
-            entity.Property(e=>e.category).HasColumnType("component_type");
+            entity.Property(e=>e.category).HasColumnType("component_type").HasConversion<string>();
         });
 
         modelBuilder.Entity<computers_on_service>(entity =>
@@ -81,7 +100,7 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.user_id)
                 .HasConstraintName("computersonservice_user_id_fkey");
             
-            entity.Property(e=>e.status).HasColumnType("service_status");
+            entity.Property(e=>e.status).HasColumnType("service_status").HasConversion<string>();
         });
 
         modelBuilder.Entity<employee_positions>(entity =>
@@ -160,7 +179,7 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.created_at).HasDefaultValueSql("CURRENT_DATE");
             entity.Property(e => e.total_amount).HasPrecision(10, 2);
-            entity.Property(o => o.status).HasColumnType("order_status");
+            entity.Property(o => o.status).HasColumnType("order_status").HasConversion<string>();
         });
 
         modelBuilder.Entity<pattern_components>(entity =>
@@ -189,8 +208,8 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.order_id)
                 .HasConstraintName("payments_order_id_fkey");
             
-            entity.Property(e=>e.status).HasColumnType("payment_status");  
-            entity.Property(e=>e.method).HasColumnType("payment_method");  
+            entity.Property(e=>e.status).HasColumnType("payment_status").HasConversion<string>();  
+            entity.Property(e=>e.method).HasColumnType("payment_method").HasConversion<string>();  
         });
 
         modelBuilder.Entity<prebuild_patterns>(entity =>
@@ -222,7 +241,7 @@ public partial class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("products_computer_id_fkey");
             
-            entity.Property(e=>e.category).HasColumnType("product_type");
+            entity.Property(e=>e.category).HasColumnType("product_type").HasConversion<string>();
         });
 
         modelBuilder.Entity<services>(entity =>
@@ -246,7 +265,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.last_name).HasMaxLength(50);
             entity.Property(e => e.phone_number).HasMaxLength(15);
 
-            entity.Property(e => e.role).HasColumnType("user_role");
+            entity.Property(e => e.role).HasColumnType("user_role").HasConversion<string>();
         });
 
         OnModelCreatingPartial(modelBuilder);

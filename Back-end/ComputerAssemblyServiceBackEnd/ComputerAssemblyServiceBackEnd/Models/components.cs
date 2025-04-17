@@ -1,4 +1,5 @@
-﻿using ComputerAssemblyServiceBackEnd.Enums.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using ComputerAssemblyServiceBackEnd.Enums.Models;
 
 namespace ComputerAssemblyServiceBackEnd.Models;
 
