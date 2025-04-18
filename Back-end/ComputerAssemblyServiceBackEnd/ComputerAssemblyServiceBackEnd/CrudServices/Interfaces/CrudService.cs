@@ -1,7 +1,7 @@
 using ComputerAssemblyServiceBackEnd.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace ComputerAssemblyServiceBackEnd.Services.Interfaces;
+namespace ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
 
 public abstract class CrudService<T> : ICrudService<T> where T : class 
 {

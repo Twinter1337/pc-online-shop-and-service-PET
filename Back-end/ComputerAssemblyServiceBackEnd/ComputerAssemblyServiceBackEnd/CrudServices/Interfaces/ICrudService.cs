@@ -1,10 +1,10 @@
 using ComputerAssemblyServiceBackEnd.Data;
 
-namespace ComputerAssemblyServiceBackEnd.Services.Interfaces;
+namespace ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
 
 public interface ICrudService<T> where T : class
 {
-    public AppDbContext Context {get;}
+    public AppDbContext Context { get; }
     Task<bool> CreateEntityAsync(T entity);
     Task<List<T>> GetAllEntitiesAsync();
     Task<T?> GetEntityByIdAsync(int id);

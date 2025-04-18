@@ -1,8 +1,8 @@
+using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
 using ComputerAssemblyServiceBackEnd.Data;
 using ComputerAssemblyServiceBackEnd.Models;
-using ComputerAssemblyServiceBackEnd.Services.Interfaces;
 
-namespace ComputerAssemblyServiceBackEnd.Services.Source;
+namespace ComputerAssemblyServiceBackEnd.CrudServices.Source;
 
 public class OrderServicesCrudService: CrudService<OrderService>
 {
