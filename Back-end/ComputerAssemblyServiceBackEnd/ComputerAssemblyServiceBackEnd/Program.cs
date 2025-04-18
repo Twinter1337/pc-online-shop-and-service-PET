@@ -5,7 +5,7 @@ using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using ComputerAssemblyServiceBackEnd.Filters.Models;
 
 
-AppDbContext dbContext = new AppDbContext();
+// AppDbContext dbContext = new AppDbContext();
 
 // ComponentsCrudService crudService = new ComponentsCrudService(dbContext);
 //
@@ -13,3 +13,10 @@ AppDbContext dbContext = new AppDbContext();
 // {
 //     Category = ComponentType.CPU
 // }).Result.Count);
+
+public class Program
+{
+    public static void Main()
+    {
+    }
+}
