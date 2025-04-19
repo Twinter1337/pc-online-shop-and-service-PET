@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using System.Text.Json.Serialization;
 using ComputerAssemblyServiceBackEnd.Enums.Models;
 using ComputerAssemblyServiceBackEnd.Mappings;
 using ComputerAssemblyServiceBackEnd.Models;
@@ -16,12 +15,7 @@ using Npgsql;
 var builder = WebApplication.CreateBuilder(args);
 
 // ===== Add services to container =====
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        options.JsonSerializerOptions.WriteIndented = true;
-    });
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMemoryCache();
 builder.Services.AddAutoMapper(typeof(MappingProfile));

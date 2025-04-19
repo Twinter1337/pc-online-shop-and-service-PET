@@ -1,14 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
-using ComputerAssemblyServiceBackEnd.CrudServices.Source;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ComputerAssemblyServiceBackEnd.Data;
 using ComputerAssemblyServiceBackEnd.Models;
 using ComputerAssemblyServiceBackEnd.Models.Dtos;
 
@@ -26,18 +18,16 @@ namespace ComputerAssemblyServiceWebApi.Controllers
             _componentsCrudService = componentsCrudService;
             _mapper = mapper;
         }
-
-        // GET: api/Components
+        
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Component>>> GetComponents()
+        public async Task<ActionResult<IEnumerable<ComponentDto>>> GetComponents()
         {
             List<Component> components = await _componentsCrudService.GetAllEntitiesAsync();
             return Ok(_mapper.Map<IEnumerable<ComponentDto>>(components));
         }
-
-        // GET: api/Components/5
+        
         [HttpGet("{id}")]
-        public async Task<ActionResult<Component>> GetComponent(int id)
+        public async Task<ActionResult<ComponentDto>> GetComponent(int id)
         {
             var component = await _componentsCrudService.GetEntityByIdAsync(id);
 
@@ -46,54 +36,42 @@ namespace ComputerAssemblyServiceWebApi.Controllers
                 return NotFound();
             }
 
-            return component;
+            return Ok(_mapper.Map<ComponentDto>(component));
         }
-
-        // PUT: api/Components/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutComponent(int id, Component component)
+        public async Task<IActionResult> PutComponent(int id, ComponentDto componentDto)
         {
-            if (id != component.ComponentId)
+            if (id != componentDto.ComponentId)
             {
                 return BadRequest();
             }
 
-            await _componentsCrudService.UpdateEntityAsync(id, component);
+            await _componentsCrudService.UpdateEntityAsync(id, _mapper.Map<Component>(componentDto));
 
             return NoContent();
         }
+        
+        [HttpPost]
+        public async Task<ActionResult<ComponentDto>> PostComponent(ComponentDto componentDto)
+        {
+            var createdComponent = _mapper.Map<Component>(componentDto);
+            await _componentsCrudService.CreateEntityAsync(createdComponent);
 
-        // // POST: api/Components
-        // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPost]
-        // public async Task<ActionResult<Component>> PostComponent(Component component)
-        // {
-        //     _context.Components.Add(component);
-        //     await _context.SaveChangesAsync();
-        //
-        //     return CreatedAtAction("GetComponent", new { id = component.ComponentId }, component);
-        // }
-        //
-        // // DELETE: api/Components/5
-        // [HttpDelete("{id}")]
-        // public async Task<IActionResult> DeleteComponent(int id)
-        // {
-        //     var component = await _context.Components.FindAsync(id);
-        //     if (component == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //
-        //     _context.Components.Remove(component);
-        //     await _context.SaveChangesAsync();
-        //
-        //     return NoContent();
-        // }
-        //
-        // private bool ComponentExists(int id)
-        // {
-        //     return _context.Components.Any(e => e.ComponentId == id);
-        // }
+            return CreatedAtAction(nameof(GetComponent), new { id = createdComponent.ComponentId },
+                _mapper.Map<ComponentDto>(createdComponent));
+        }
+        
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteComponent(int id)
+        {
+            bool result = await _componentsCrudService.DeleteEntityAsync(id);
+            if (!result)
+            {
+                return NotFound();
+            }
+        
+            return NoContent();
+        }
     }
 }
