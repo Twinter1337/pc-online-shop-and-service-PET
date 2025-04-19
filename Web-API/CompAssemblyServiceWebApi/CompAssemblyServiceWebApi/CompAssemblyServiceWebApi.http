@@ -1,0 +1,6 @@
+@CompAssemblyServiceWebApi_HostAddress = http://localhost:5153
+
+GET {{CompAssemblyServiceWebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
