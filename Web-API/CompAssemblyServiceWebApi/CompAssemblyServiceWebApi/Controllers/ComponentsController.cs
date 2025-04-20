@@ -1,5 +1,7 @@
 using AutoMapper;
 using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
+using ComputerAssemblyServiceBackEnd.CrudServices.Source;
+using ComputerAssemblyServiceBackEnd.Filters.Models;
 using Microsoft.AspNetCore.Mvc;
 using ComputerAssemblyServiceBackEnd.Models;
 using ComputerAssemblyServiceBackEnd.Models.Dtos;
@@ -26,6 +28,14 @@ namespace ComputerAssemblyServiceWebApi.Controllers
             return Ok(_mapper.Map<IEnumerable<ComponentDto>>(components));
         }
         
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<ComponentDto>>> GetFilteredComponents([FromQuery]ComponentFilter filter)
+        {
+            ComponentsCrudService componentsCrudService = (_componentsCrudService as ComponentsCrudService)!;
+            List<Component> components = await componentsCrudService.GetFilteredComponentsAsync(filter);
+            return Ok(_mapper.Map<IEnumerable<ComponentDto>>(components));
+        }
+        
         [HttpGet("{id}")]
         public async Task<ActionResult<ComponentDto>> GetComponent(int id)
         {
@@ -47,8 +57,13 @@ namespace ComputerAssemblyServiceWebApi.Controllers
                 return BadRequest();
             }
 
-            await _componentsCrudService.UpdateEntityAsync(id, _mapper.Map<Component>(componentDto));
+            bool result = await _componentsCrudService.UpdateEntityAsync(id, _mapper.Map<Component>(componentDto));
 
+            if (!result)
+            {
+                return NotFound();
+            }
+            
             return NoContent();
         }
         
@@ -56,7 +71,12 @@ namespace ComputerAssemblyServiceWebApi.Controllers
         public async Task<ActionResult<ComponentDto>> PostComponent(ComponentDto componentDto)
         {
             var createdComponent = _mapper.Map<Component>(componentDto);
-            await _componentsCrudService.CreateEntityAsync(createdComponent);
+            bool result = await _componentsCrudService.CreateEntityAsync(createdComponent);
+
+            if (!result)
+            {
+                return BadRequest();
+            }
 
             return CreatedAtAction(nameof(GetComponent), new { id = createdComponent.ComponentId },
                 _mapper.Map<ComponentDto>(createdComponent));

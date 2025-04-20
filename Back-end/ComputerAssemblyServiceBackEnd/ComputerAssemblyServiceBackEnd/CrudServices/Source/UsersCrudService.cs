@@ -12,15 +12,13 @@ public class UsersCrudService : CrudService<User>
         Context = context;
     }
 
-    public async Task<User> GetUserByEmailAsync(string email)
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
-        return await Context.Users.FirstOrDefaultAsync(user => user.Email.Equals(email)) ??
-               throw new InvalidOperationException();
+        return await Context.Users.FirstOrDefaultAsync(user => user.Email.Equals(email));
     }
 
-    public async Task<User> GetUserByPhoneNumberAsync(string phoneNumber)
+    public async Task<User?> GetUserByPhoneNumberAsync(string phoneNumber)
     {
-        return await Context.Users.FirstOrDefaultAsync(user => user.PhoneNumber.Equals(phoneNumber)) ??
-               throw new InvalidOperationException();
+        return await Context.Users.FirstOrDefaultAsync(user => user.PhoneNumber.Equals(phoneNumber));
     }
 }

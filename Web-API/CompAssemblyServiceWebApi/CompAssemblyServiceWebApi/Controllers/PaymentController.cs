@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
+using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
+using ComputerAssemblyServiceBackEnd.CrudServices.Source;
+using ComputerAssemblyServiceBackEnd.Filters.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ComputerAssemblyServiceBackEnd.Data;
 using ComputerAssemblyServiceBackEnd.Models;
+using ComputerAssemblyServiceBackEnd.Models.Dtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -14,95 +12,95 @@ namespace CompAssemblyServiceWebApi.Controllers
     [ApiController]
     public class PaymentController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICrudService<Payment> _paymentCrudService;
+        private readonly IMapper _mapper;
 
-        public PaymentController(AppDbContext context)
+        public PaymentController(ICrudService<Payment> paymentCrudService, IMapper mapper)
         {
-            _context = context;
+            _paymentCrudService = paymentCrudService;
+            _mapper = mapper;
         }
 
-        // GET: api/Payment
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Payment>>> GetPayments()
+        public async Task<ActionResult<IEnumerable<PaymentDto>>> GetPayments()
         {
-            return await _context.Payments.ToListAsync();
+            List<Payment> payments = await _paymentCrudService.GetAllEntitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<PaymentDto>>(payments));
+        }
+        
+        [HttpGet("by-order/{orderId}")]
+        public async Task<ActionResult<IEnumerable<PaymentDto>>> GetPaymentsByOrderId(int orderId)
+        {
+            PaymentsCrudService paymentsCrudService = (_paymentCrudService as PaymentsCrudService)!;
+            List<Payment> payments = await paymentsCrudService.GetPaymentsByOrderIdAsync(orderId);
+            return Ok(_mapper.Map<IEnumerable<PaymentDto>>(payments));
+        }
+        
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<PaymentDto>>> GetFilteredPayments([FromQuery] PaymentFilter filter)
+        {
+            PaymentsCrudService paymentsCrudService = (_paymentCrudService as PaymentsCrudService)!;
+            List<Payment> payments = await paymentsCrudService.GetFilteredPaymentsAsync(filter);
+            return Ok(_mapper.Map<IEnumerable<PaymentDto>>(payments));
         }
 
-        // GET: api/Payment/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Payment>> GetPayment(int id)
+        public async Task<ActionResult<PaymentDto>> GetPayment(int id)
         {
-            var payment = await _context.Payments.FindAsync(id);
+            var payment = await _paymentCrudService.GetEntityByIdAsync(id);
 
             if (payment == null)
             {
                 return NotFound();
             }
 
-            return payment;
+            return Ok(_mapper.Map<PaymentDto>(payment));
         }
-
-        // PUT: api/Payment/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPayment(int id, Payment payment)
+        public async Task<IActionResult> PutPayment(int id, PaymentDto paymentDto)
         {
-            if (id != payment.PaymentId)
+            if (id != paymentDto.PaymentId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(payment).State = EntityState.Modified;
+            bool result = await _paymentCrudService.UpdateEntityAsync(id, _mapper.Map<Payment>(paymentDto));
 
-            try
+            if (!result)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PaymentExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            
             return NoContent();
         }
-
-        // POST: api/Payment
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPost]
-        public async Task<ActionResult<Payment>> PostPayment(Payment payment)
+        public async Task<ActionResult<PaymentDto>> PostPayment(PaymentDto paymentDto)
         {
-            _context.Payments.Add(payment);
-            await _context.SaveChangesAsync();
+            var createdPayment = _mapper.Map<Payment>(paymentDto);
+            bool result = await _paymentCrudService.CreateEntityAsync(createdPayment);
 
-            return CreatedAtAction("GetPayment", new { id = payment.PaymentId }, payment);
+            if (!result)
+            {
+                return BadRequest();
+            }
+            
+            return CreatedAtAction(nameof(GetPayment), new { id = createdPayment.PaymentId },
+                _mapper.Map<PaymentDto>(createdPayment));
         }
-
-        // DELETE: api/Payment/5
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePayment(int id)
         {
-            var payment = await _context.Payments.FindAsync(id);
-            if (payment == null)
+            bool result = await _paymentCrudService.DeleteEntityAsync(id);
+
+            if (!result)
             {
                 return NotFound();
             }
-
-            _context.Payments.Remove(payment);
-            await _context.SaveChangesAsync();
-
+            
             return NoContent();
-        }
-
-        private bool PaymentExists(int id)
-        {
-            return _context.Payments.Any(e => e.PaymentId == id);
         }
     }
 }

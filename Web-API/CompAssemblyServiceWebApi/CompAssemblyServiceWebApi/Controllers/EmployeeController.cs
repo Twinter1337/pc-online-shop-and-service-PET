@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
+using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
+using ComputerAssemblyServiceBackEnd.CrudServices.Source;
+using ComputerAssemblyServiceBackEnd.Filters.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ComputerAssemblyServiceBackEnd.Data;
 using ComputerAssemblyServiceBackEnd.Models;
+using ComputerAssemblyServiceBackEnd.Models.Dtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -14,95 +12,116 @@ namespace CompAssemblyServiceWebApi.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICrudService<Employee> _employeeCrudService;
+        private readonly IMapper _mapper;
 
-        public EmployeeController(AppDbContext context)
+        public EmployeeController(ICrudService<Employee> employeeCrudService, IMapper mapper)
         {
-            _context = context;
+            _employeeCrudService = employeeCrudService;
+            _mapper = mapper;
         }
 
-        // GET: api/Employee
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
+        public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployees()
         {
-            return await _context.Employees.ToListAsync();
+            List<Employee> employees = await _employeeCrudService.GetAllEntitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<EmployeeDto>>(employees));
         }
 
-        // GET: api/Employee/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(int id)
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetFilteredEmployees(
+            [FromQuery] EmployeeFilter filter)
         {
-            var employee = await _context.Employees.FindAsync(id);
+            EmployeesCrudService employeeCrudService = (_employeeCrudService as EmployeesCrudService)!;
+            List<Employee> employees = await employeeCrudService.GetFilteredEmployeeAsync(filter);
+            return Ok(_mapper.Map<IEnumerable<EmployeeDto>>(employees));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EmployeeDto>> GetEmployee(int id)
+        {
+            var employee = await _employeeCrudService.GetEntityByIdAsync(id);
 
             if (employee == null)
             {
                 return NotFound();
             }
 
-            return employee;
+            return Ok(_mapper.Map<EmployeeDto>(employee));
         }
 
-        // PUT: api/Employee/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(int id, Employee employee)
+        [HttpGet("get-user/{employeeId}")]
+        public async Task<ActionResult<EmployeeDto>> GetUserByEmployeeId(int employeeId)
         {
-            if (id != employee.EmployeeId)
+            EmployeesCrudService employeeCrudService = (_employeeCrudService as EmployeesCrudService)!;
+            var employeeUser = await employeeCrudService.GetEmployeeUserByIdAsync(employeeId);
+
+            if (employeeUser == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<UserDto>(employeeUser));
+        }
+
+        [HttpGet("by-bank-account/{bankAccount}")]
+        public async Task<ActionResult<EmployeeDto>> GetUserByEmployeeId(string bankAccount)
+        {
+            EmployeesCrudService employeeCrudService = (_employeeCrudService as EmployeesCrudService)!;
+            var employee = await employeeCrudService.GetEmployeeByBankAccountAsync(bankAccount);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<EmployeeDto>(employee));
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutEmployee(int id, EmployeeDto employeeDto)
+        {
+            if (id != employeeDto.EmployeeId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(employee).State = EntityState.Modified;
+            bool result = await _employeeCrudService.UpdateEntityAsync(id, _mapper.Map<Employee>(employeeDto));
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EmployeeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Employee
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
-        {
-            _context.Employees.Add(employee);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetEmployee", new { id = employee.EmployeeId }, employee);
-        }
-
-        // DELETE: api/Employee/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
-        {
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee == null)
+            if (!result)
             {
                 return NotFound();
             }
 
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
-        private bool EmployeeExists(int id)
+        [HttpPost]
+        public async Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employeeDto)
         {
-            return _context.Employees.Any(e => e.EmployeeId == id);
+            var createdEmployee = _mapper.Map<Employee>(employeeDto);
+            bool result = await _employeeCrudService.CreateEntityAsync(createdEmployee);
+            
+            if (!result)
+            {
+                return BadRequest();
+            }
+
+            return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.EmployeeId },
+                _mapper.Map<EmployeeDto>(createdEmployee));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEmployee(int id)
+        {
+            bool result = await _employeeCrudService.DeleteEntityAsync(id);
+
+            if (!result)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
         }
     }
 }

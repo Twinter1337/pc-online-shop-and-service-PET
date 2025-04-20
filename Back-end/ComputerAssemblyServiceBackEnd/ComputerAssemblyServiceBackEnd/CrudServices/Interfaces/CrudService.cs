@@ -12,7 +12,7 @@ public abstract class CrudService<T> : ICrudService<T> where T : class
 
     public AppDbContext Context { get; protected set; }
 
-    public async Task<bool> CreateEntityAsync(T entity)
+    public virtual async Task<bool> CreateEntityAsync(T entity)
     {
         var dbSet = Context.Set<T>();
         
@@ -36,17 +36,17 @@ public abstract class CrudService<T> : ICrudService<T> where T : class
         return true;
     }
 
-    public async Task<List<T>> GetAllEntitiesAsync()
+    public virtual async Task<List<T>> GetAllEntitiesAsync()
     {
         return await Context.Set<T>().ToListAsync();
     }
 
-    public async Task<T?> GetEntityByIdAsync(int id) 
+    public virtual async Task<T?> GetEntityByIdAsync(int id) 
     {
         return await Context.Set<T>().FindAsync(id);
     }
 
-    public async Task<bool> UpdateEntityAsync(int id, T entity) 
+    public virtual async Task<bool> UpdateEntityAsync(int id, T entity) 
     {
         var dbSet = Context.Set<T>();
         
@@ -60,7 +60,7 @@ public abstract class CrudService<T> : ICrudService<T> where T : class
         return true;
     }
 
-    public async Task<bool> DeleteEntityAsync(int id) 
+    public virtual async Task<bool> DeleteEntityAsync(int id) 
     {
         var dbSet = Context.Set<T>();
         

@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
+using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
+using ComputerAssemblyServiceBackEnd.CrudServices.Source;
+using ComputerAssemblyServiceBackEnd.Filters.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ComputerAssemblyServiceBackEnd.Data;
 using ComputerAssemblyServiceBackEnd.Models;
+using ComputerAssemblyServiceBackEnd.Models.Dtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -14,95 +12,95 @@ namespace CompAssemblyServiceWebApi.Controllers
     [ApiController]
     public class OrderItemController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICrudService<OrderItem> _orderItemCrudService;
+        private readonly IMapper _mapper;
 
-        public OrderItemController(AppDbContext context)
+        public OrderItemController(ICrudService<OrderItem> orderItemCrudService, IMapper mapper)
         {
-            _context = context;
+            _orderItemCrudService = orderItemCrudService;
+            _mapper = mapper;
         }
 
-        // GET: api/OrderItem
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderItem>>> GetOrderItems()
+        public async Task<ActionResult<IEnumerable<OrderItemDto>>> GetOrderItems()
         {
-            return await _context.OrderItems.ToListAsync();
+            List<OrderItem> orderItems = await _orderItemCrudService.GetAllEntitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<OrderItemDto>>(orderItems));
+        }
+        
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<OrderItemDto>>> GetFilterOrderItems([FromQuery]OrderItemFilter filter)
+        {
+            OrderItemsCrudService orderItemsCrudService = (_orderItemCrudService as OrderItemsCrudService)!;
+            List<OrderItem> orderItems = await orderItemsCrudService.GetFilteredOrderItemsAsync(filter);
+            return Ok(_mapper.Map<IEnumerable<OrderItemDto>>(orderItems));
+        }
+        
+        [HttpGet("by-order/{orderId}")]
+        public async Task<ActionResult<IEnumerable<OrderItemDto>>> GetOrderItemByOrderId(int orderId)
+        {
+            OrderItemsCrudService orderItemsCrudService = (_orderItemCrudService as OrderItemsCrudService)!;
+            List<OrderItem> orderItems = await orderItemsCrudService.GetOrderItemsByOrderIdAsync(orderId);
+
+            return Ok(_mapper.Map<IEnumerable<OrderItemDto>>(orderItems));
         }
 
-        // GET: api/OrderItem/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<OrderItem>> GetOrderItem(int id)
+        public async Task<ActionResult<OrderItemDto>> GetOrderItem(int id)
         {
-            var orderItem = await _context.OrderItems.FindAsync(id);
+            var orderItem = await _orderItemCrudService.GetEntityByIdAsync(id);
 
             if (orderItem == null)
             {
                 return NotFound();
             }
 
-            return orderItem;
+            return Ok(_mapper.Map<OrderItemDto>(orderItem));
         }
 
-        // PUT: api/OrderItem/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrderItem(int id, OrderItem orderItem)
+        public async Task<IActionResult> PutOrderItem(int id, OrderItemDto orderItemDto)
         {
-            if (id != orderItem.ItemId)
+            if (id != orderItemDto.ItemId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(orderItem).State = EntityState.Modified;
+            bool result = await _orderItemCrudService.UpdateEntityAsync(id, _mapper.Map<OrderItem>(orderItemDto));
 
-            try
+            if (!result)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!OrderItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest();
             }
 
             return NoContent();
         }
 
-        // POST: api/OrderItem
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<OrderItem>> PostOrderItem(OrderItem orderItem)
+        public async Task<ActionResult<OrderItemDto>> PostOrderItem(OrderItemDto orderItemDto)
         {
-            _context.OrderItems.Add(orderItem);
-            await _context.SaveChangesAsync();
+            var createdOrderItem = _mapper.Map<OrderItem>(orderItemDto);
+            bool result = await _orderItemCrudService.CreateEntityAsync(createdOrderItem);
 
-            return CreatedAtAction("GetOrderItem", new { id = orderItem.ItemId }, orderItem);
+            if (!result)
+            {
+                return BadRequest();
+            }
+
+            return CreatedAtAction(nameof(GetOrderItem), new { id = createdOrderItem.ItemId },
+                _mapper.Map<OrderItemDto>(createdOrderItem));
         }
-
-        // DELETE: api/OrderItem/5
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrderItem(int id)
         {
-            var orderItem = await _context.OrderItems.FindAsync(id);
-            if (orderItem == null)
+            bool result = await _orderItemCrudService.DeleteEntityAsync(id);
+            if (!result)
             {
                 return NotFound();
             }
 
-            _context.OrderItems.Remove(orderItem);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool OrderItemExists(int id)
-        {
-            return _context.OrderItems.Any(e => e.ItemId == id);
         }
     }
 }

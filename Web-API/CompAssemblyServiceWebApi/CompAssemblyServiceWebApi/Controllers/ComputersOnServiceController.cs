@@ -1,7 +1,10 @@
+using AutoMapper;
+using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
+using ComputerAssemblyServiceBackEnd.CrudServices.Source;
+using ComputerAssemblyServiceBackEnd.Filters.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ComputerAssemblyServiceBackEnd.Data;
 using ComputerAssemblyServiceBackEnd.Models;
+using ComputerAssemblyServiceBackEnd.Models.Dtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -9,95 +12,102 @@ namespace CompAssemblyServiceWebApi.Controllers
     [ApiController]
     public class ComputersOnServiceController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICrudService<ComputerOnService> _computerOnServiceCrudService;
+        private readonly IMapper _mapper;
 
-        public ComputersOnServiceController(AppDbContext context)
+        public ComputersOnServiceController(ICrudService<ComputerOnService> computerOnServiceCrudService,
+            IMapper mapper)
         {
-            _context = context;
+            _computerOnServiceCrudService = computerOnServiceCrudService;
+            _mapper = mapper;
         }
 
-        // GET: api/ComputersOnService
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ComputerOnService>>> GetComputersOnService()
+        public async Task<ActionResult<IEnumerable<ComputerOnServiceDto>>> GetComputersOnService()
         {
-            return await _context.ComputersOnService.ToListAsync();
+            List<ComputerOnService> computerOnServices = await _computerOnServiceCrudService.GetAllEntitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<ComputerOnServiceDto>>(computerOnServices));
         }
 
-        // GET: api/ComputersOnService/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ComputerOnService>> GetComputerOnService(int id)
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<ComputerOnServiceDto>>> GetFilteredComputersOnService(
+            [FromQuery] ComputerOnServiceFilter filter)
         {
-            var computerOnService = await _context.ComputersOnService.FindAsync(id);
+            ComputersOnCrudServiceCrudService computersOnServiceCrudService =
+                (_computerOnServiceCrudService as ComputersOnCrudServiceCrudService)!;
+            List<ComputerOnService> computersOnService =
+                await computersOnServiceCrudService.GetFilteredComputersOnServiceAsync(filter);
+            return Ok(_mapper.Map<IEnumerable<ComputerOnServiceDto>>(computersOnService));
+        }
+
+        [HttpGet("by-user/{userId}")]
+        public async Task<ActionResult<IEnumerable<ComputerOnServiceDto>>> GetFilteredComputersOnService(int userId)
+        {
+            ComputersOnCrudServiceCrudService computersOnServiceCrudService =
+                (_computerOnServiceCrudService as ComputersOnCrudServiceCrudService)!;
+            var computersOnService = await computersOnServiceCrudService.GetComputersOnServiceByUserIdAsync(userId);
+            return Ok(_mapper.Map<IEnumerable<ComputerOnServiceDto>>(computersOnService));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ComputerOnServiceDto>> GetComputerOnService(int id)
+        {
+            var computerOnService = await _computerOnServiceCrudService.GetEntityByIdAsync(id);
 
             if (computerOnService == null)
             {
                 return NotFound();
             }
 
-            return computerOnService;
+            return Ok(_mapper.Map<ComputerOnServiceDto>(computerOnService));
         }
 
-        // PUT: api/ComputersOnService/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutComputerOnService(int id, ComputerOnService computerOnService)
+        public async Task<IActionResult> PutComputerOnService(int id, ComputerOnServiceDto computerOnServiceDto)
         {
-            if (id != computerOnService.ComputerOnServiceId)
+            if (id != computerOnServiceDto.ComputerOnServiceId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(computerOnService).State = EntityState.Modified;
+            bool result = await _computerOnServiceCrudService.UpdateEntityAsync(id,
+                _mapper.Map<ComputerOnService>(computerOnServiceDto));
 
-            try
+            if (!result)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ComputerOnServiceExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest();
             }
 
             return NoContent();
         }
 
-        // POST: api/ComputersOnService
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ComputerOnService>> PostComputerOnService(ComputerOnService computerOnService)
+        public async Task<ActionResult<ComputerOnServiceDto>> PostComputerOnService(
+            ComputerOnServiceDto computerOnServiceDto)
         {
-            _context.ComputersOnService.Add(computerOnService);
-            await _context.SaveChangesAsync();
+            var createdComputerOnService = _mapper.Map<ComputerOnService>(computerOnServiceDto);
+            bool result = await _computerOnServiceCrudService.CreateEntityAsync(createdComputerOnService);
 
-            return CreatedAtAction("GetComputerOnService", new { id = computerOnService.ComputerOnServiceId }, computerOnService);
+            if (!result)
+            {
+                return BadRequest();
+            }
+
+            return CreatedAtAction(nameof(GetComputerOnService),
+                new { id = createdComputerOnService.ComputerOnServiceId },
+                _mapper.Map<ComputerOnServiceDto>(createdComputerOnService));
         }
 
-        // DELETE: api/ComputersOnService/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteComputerOnService(int id)
         {
-            var computerOnService = await _context.ComputersOnService.FindAsync(id);
-            if (computerOnService == null)
+            bool result = await _computerOnServiceCrudService.DeleteEntityAsync(id);
+            if (!result)
             {
                 return NotFound();
             }
 
-            _context.ComputersOnService.Remove(computerOnService);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool ComputerOnServiceExists(int id)
-        {
-            return _context.ComputersOnService.Any(e => e.ComputerOnServiceId == id);
         }
     }
 }

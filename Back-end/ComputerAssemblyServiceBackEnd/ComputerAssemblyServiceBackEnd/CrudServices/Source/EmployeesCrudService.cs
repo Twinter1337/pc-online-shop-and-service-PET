@@ -49,7 +49,7 @@ public class EmployeesCrudService : CrudService<Employee>
             .ToListAsync();
     }
 
-    public async Task<User> GetEmployeeUserByIdAsync(int employeeId)
+    public async Task<User?> GetEmployeeUserByIdAsync(int employeeId)
     {
         var epUser = await Context.Employees.Include(employee => employee.User)
             .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
@@ -57,7 +57,7 @@ public class EmployeesCrudService : CrudService<Employee>
         return epUser?.User;
     }
 
-    public async Task<Employee> GetEmployeeByBankAccountAsync(string bankAccount)
+    public async Task<Employee?> GetEmployeeByBankAccountAsync(string bankAccount)
     {
         return await Context.Employees.FirstOrDefaultAsync(e => e.BankAccount == bankAccount) ??
                throw new

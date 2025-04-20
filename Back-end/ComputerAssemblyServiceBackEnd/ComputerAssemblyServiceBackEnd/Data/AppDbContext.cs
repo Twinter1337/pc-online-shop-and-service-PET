@@ -454,6 +454,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Price)
                 .HasPrecision(10, 2)
                 .HasColumnName("price");
+            
+            entity.Property(e => e.Description)
+                .HasColumnName("description");
         });
 
         modelBuilder.Entity<User>(entity =>

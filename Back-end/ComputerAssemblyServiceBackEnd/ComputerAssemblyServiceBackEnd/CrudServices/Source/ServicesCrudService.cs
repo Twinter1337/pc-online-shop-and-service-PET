@@ -11,7 +11,7 @@ public class ServicesCrudService: CrudService<Service>
     {
     }
 
-    public async Task<Service> GetServiceByNameAsync(string name)
+    public async Task<Service?> GetServiceByNameAsync(string name)
     {
         return await Context.Services.FirstOrDefaultAsync(s => s.Name == name) ?? throw new InvalidOperationException();
     }

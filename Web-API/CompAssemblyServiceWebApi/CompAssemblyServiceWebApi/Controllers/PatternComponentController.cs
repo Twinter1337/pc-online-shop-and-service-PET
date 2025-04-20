@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
+using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
+using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ComputerAssemblyServiceBackEnd.Data;
 using ComputerAssemblyServiceBackEnd.Models;
+using ComputerAssemblyServiceBackEnd.Models.Dtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -14,95 +11,94 @@ namespace CompAssemblyServiceWebApi.Controllers
     [ApiController]
     public class PatternComponentController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICrudService<PatternComponent> _patternComponentCrudService;
+        private readonly IMapper _mapper;
 
-        public PatternComponentController(AppDbContext context)
+        public PatternComponentController(ICrudService<PatternComponent> patternComponentCrudService, IMapper mapper)
         {
-            _context = context;
+            _patternComponentCrudService = patternComponentCrudService;
+            _mapper = mapper;
         }
 
-        // GET: api/PatternComponent
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PatternComponent>>> GetPatternComponents()
+        public async Task<ActionResult<IEnumerable<PatternComponentDto>>> GetPatternComponents()
         {
-            return await _context.PatternComponents.ToListAsync();
+            List<PatternComponent> patternComponents = await _patternComponentCrudService.GetAllEntitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<PatternComponentDto>>(patternComponents));
         }
 
-        // GET: api/PatternComponent/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PatternComponent>> GetPatternComponent(int id)
+        [HttpGet("by-prebuild/{prebuildId}")]
+        public async Task<ActionResult<IEnumerable<PatternComponentDto>>> GetPatternComponentsByPrebuildPatternId(
+            int prebuildId)
         {
-            var patternComponent = await _context.PatternComponents.FindAsync(id);
+            PatternComponentsCrudService patternComponentCrudService =
+                (_patternComponentCrudService as PatternComponentsCrudService)!;
+            List<PatternComponent> patternComponents =
+                await patternComponentCrudService.GetPatternComponentsByPrebuildPatternIdAsync(prebuildId);
+            
+            return Ok(_mapper.Map<IEnumerable<PatternComponentDto>>(patternComponents));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PatternComponentDto>> GetPatternComponent(int id)
+        {
+            var patternComponent = await _patternComponentCrudService.GetEntityByIdAsync(id);
 
             if (patternComponent == null)
             {
                 return NotFound();
             }
 
-            return patternComponent;
+            return Ok(_mapper.Map<PatternComponentDto>(patternComponent));
         }
 
-        // PUT: api/PatternComponent/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPatternComponent(int id, PatternComponent patternComponent)
+        public async Task<IActionResult> PutPatternComponent(int id, PatternComponentDto patternComponentDto)
         {
-            if (id != patternComponent.PatternComponentId)
+            if (id != patternComponentDto.PatternComponentId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(patternComponent).State = EntityState.Modified;
+            bool result =
+                await _patternComponentCrudService.UpdateEntityAsync(id,
+                    _mapper.Map<PatternComponent>(patternComponentDto));
 
-            try
+            if (!result)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PatternComponentExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest();
             }
 
             return NoContent();
         }
 
-        // POST: api/PatternComponent
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PatternComponent>> PostPatternComponent(PatternComponent patternComponent)
+        public async Task<ActionResult<PatternComponentDto>> PostPatternComponent(
+            PatternComponentDto patternComponentDto)
         {
-            _context.PatternComponents.Add(patternComponent);
-            await _context.SaveChangesAsync();
+            var createdPatternComponent = _mapper.Map<PatternComponent>(patternComponentDto);
+            bool result = await _patternComponentCrudService.CreateEntityAsync(createdPatternComponent);
 
-            return CreatedAtAction("GetPatternComponent", new { id = patternComponent.PatternComponentId }, patternComponent);
+            if (!result)
+            {
+                return BadRequest();
+            }
+
+            return CreatedAtAction(nameof(GetPatternComponent), new { id = createdPatternComponent.PatternComponentId },
+                _mapper.Map<PatternComponentDto>(createdPatternComponent));
         }
 
-        // DELETE: api/PatternComponent/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePatternComponent(int id)
         {
-            var patternComponent = await _context.PatternComponents.FindAsync(id);
-            if (patternComponent == null)
+            bool result = await _patternComponentCrudService.DeleteEntityAsync(id);
+
+            if (!result)
             {
                 return NotFound();
             }
 
-            _context.PatternComponents.Remove(patternComponent);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool PatternComponentExists(int id)
-        {
-            return _context.PatternComponents.Any(e => e.PatternComponentId == id);
         }
     }
 }

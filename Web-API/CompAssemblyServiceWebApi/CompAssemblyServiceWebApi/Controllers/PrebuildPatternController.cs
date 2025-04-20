@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
+using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
+using ComputerAssemblyServiceBackEnd.CrudServices.Source;
+using ComputerAssemblyServiceBackEnd.Filters.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ComputerAssemblyServiceBackEnd.Data;
 using ComputerAssemblyServiceBackEnd.Models;
+using ComputerAssemblyServiceBackEnd.Models.Dtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -14,95 +12,89 @@ namespace CompAssemblyServiceWebApi.Controllers
     [ApiController]
     public class PrebuildPatternController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICrudService<PrebuildPattern> _prebuildPatternCrudService;
+        private readonly IMapper _mapper;
 
-        public PrebuildPatternController(AppDbContext context)
+        public PrebuildPatternController(ICrudService<PrebuildPattern> prebuildPatternCrudService, IMapper mapper)
         {
-            _context = context;
+            _prebuildPatternCrudService = prebuildPatternCrudService;
+            _mapper = mapper;
         }
 
-        // GET: api/PrebuildPattern
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PrebuildPattern>>> GetPrebuildPatterns()
+        public async Task<ActionResult<IEnumerable<PrebuildPatternDto>>> GetPrebuildPatterns()
         {
-            return await _context.PrebuildPatterns.ToListAsync();
+            List<PrebuildPattern> prebuildPatterns = await _prebuildPatternCrudService.GetAllEntitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<PrebuildPatternDto>>(prebuildPatterns));
+        }
+        
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<PrebuildPatternDto>>> GetFilteredPrebuildPatterns([FromQuery] PrebuildPatternFilter filter)
+        {
+            PrebuildPatternsCrudService prebuildPatternsCrudService = (_prebuildPatternCrudService as PrebuildPatternsCrudService)!;
+            List<PrebuildPattern> prebuildPatterns = await prebuildPatternsCrudService.GetFilteredPrebuildPatternsAsync(filter);
+            return Ok(_mapper.Map<IEnumerable<PrebuildPatternDto>>(prebuildPatterns));
         }
 
-        // GET: api/PrebuildPattern/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PrebuildPattern>> GetPrebuildPattern(int id)
+        public async Task<ActionResult<PrebuildPatternDto>> GetPrebuildPattern(int id)
         {
-            var prebuildPattern = await _context.PrebuildPatterns.FindAsync(id);
+            var prebuildPattern = await _prebuildPatternCrudService.GetEntityByIdAsync(id);
 
             if (prebuildPattern == null)
             {
                 return NotFound();
             }
 
-            return prebuildPattern;
+            return Ok(_mapper.Map<PrebuildPatternDto>(prebuildPattern));
         }
-
-        // PUT: api/PrebuildPattern/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPrebuildPattern(int id, PrebuildPattern prebuildPattern)
+        public async Task<IActionResult> PutPrebuildPattern(int id, PrebuildPatternDto prebuildPatternDto)
         {
-            if (id != prebuildPattern.SerialNumber)
+            if (id != prebuildPatternDto.SerialNumber)
             {
                 return BadRequest();
             }
 
-            _context.Entry(prebuildPattern).State = EntityState.Modified;
+            bool result =
+                await _prebuildPatternCrudService.UpdateEntityAsync(id,
+                    _mapper.Map<PrebuildPattern>(prebuildPatternDto));
 
-            try
+            if (!result)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PrebuildPatternExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            
             return NoContent();
         }
-
-        // POST: api/PrebuildPattern
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPost]
-        public async Task<ActionResult<PrebuildPattern>> PostPrebuildPattern(PrebuildPattern prebuildPattern)
+        public async Task<ActionResult<PrebuildPatternDto>> PostPrebuildPattern(PrebuildPatternDto prebuildPatternDto)
         {
-            _context.PrebuildPatterns.Add(prebuildPattern);
-            await _context.SaveChangesAsync();
+            var createdPrebuildPattern = _mapper.Map<PrebuildPattern>(prebuildPatternDto);
+            bool result = await _prebuildPatternCrudService.CreateEntityAsync(createdPrebuildPattern);
 
-            return CreatedAtAction("GetPrebuildPattern", new { id = prebuildPattern.SerialNumber }, prebuildPattern);
+            if (!result)
+            {
+                return BadRequest();
+            }
+            
+            return CreatedAtAction(nameof(GetPrebuildPattern), new { id = createdPrebuildPattern.SerialNumber },
+                _mapper.Map<PrebuildPattern>(createdPrebuildPattern));
         }
-
-        // DELETE: api/PrebuildPattern/5
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePrebuildPattern(int id)
         {
-            var prebuildPattern = await _context.PrebuildPatterns.FindAsync(id);
-            if (prebuildPattern == null)
+            bool result = await _prebuildPatternCrudService.DeleteEntityAsync(id);
+
+            if (!result)
             {
-                return NotFound();
+                return BadRequest();
             }
-
-            _context.PrebuildPatterns.Remove(prebuildPattern);
-            await _context.SaveChangesAsync();
-
+            
             return NoContent();
-        }
-
-        private bool PrebuildPatternExists(int id)
-        {
-            return _context.PrebuildPatterns.Any(e => e.SerialNumber == id);
         }
     }
 }

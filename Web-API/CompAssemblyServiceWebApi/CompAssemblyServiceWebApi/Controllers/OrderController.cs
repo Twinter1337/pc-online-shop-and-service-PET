@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
+using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
+using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ComputerAssemblyServiceBackEnd.Data;
+using ComputerAssemblyServiceBackEnd.Filters.Models;
 using ComputerAssemblyServiceBackEnd.Models;
+using ComputerAssemblyServiceBackEnd.Models.Dtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -14,95 +12,86 @@ namespace CompAssemblyServiceWebApi.Controllers
     [ApiController]
     public class OrderController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICrudService<Order> _orderCrudService;
+        private readonly IMapper _mapper;
 
-        public OrderController(AppDbContext context)
+        public OrderController(ICrudService<Order> orderCrudService, IMapper mapper)
         {
-            _context = context;
+            _orderCrudService = orderCrudService;
+            _mapper = mapper;
         }
 
-        // GET: api/Order
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
+        public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrders()
         {
-            return await _context.Orders.ToListAsync();
+            List<Order> orders = await _orderCrudService.GetAllEntitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<OrderDto>>(orders));
         }
 
-        // GET: api/Order/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder(int id)
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<OrderDto>>> GetFilteredOrders([FromQuery] OrderFilter filter)
         {
-            var order = await _context.Orders.FindAsync(id);
+            OrdersCrudService ordersCrudService = (_orderCrudService as OrdersCrudService)!;
+            List<Order> orders = await ordersCrudService.GetFilteredOrdersAsync(filter);
+            return Ok(_mapper.Map<IEnumerable<OrderDto>>(orders));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<OrderDto>> GetOrder(int id)
+        {
+            var order = await _orderCrudService.GetEntityByIdAsync(id);
 
             if (order == null)
             {
                 return NotFound();
             }
 
-            return order;
+            return Ok(_mapper.Map<OrderDto>(order));
         }
-
-        // PUT: api/Order/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder(int id, Order order)
+        public async Task<IActionResult> PutOrder(int id, OrderDto orderDto)
         {
-            if (id != order.OrderId)
+            if (id != orderDto.OrderId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(order).State = EntityState.Modified;
+            bool result = await _orderCrudService.UpdateEntityAsync(id, _mapper.Map<Order>(orderDto));
 
-            try
+            if (!result)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!OrderExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest();
             }
 
             return NoContent();
         }
-
-        // POST: api/Order
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPost]
-        public async Task<ActionResult<Order>> PostOrder(Order order)
+        public async Task<ActionResult<OrderDto>> PostOrder(OrderDto orderDto)
         {
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+            var createdOrder = _mapper.Map<Order>(orderDto);
+            bool result = await _orderCrudService.CreateEntityAsync(createdOrder);
 
-            return CreatedAtAction("GetOrder", new { id = order.OrderId }, order);
+            if (!result)
+            {
+                return BadRequest();
+            }
+            
+            return CreatedAtAction(nameof(GetOrder), new {id = createdOrder.OrderId},
+                _mapper.Map<OrderDto>(createdOrder));
         }
-
-        // DELETE: api/Order/5
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrder(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null)
+            bool result = await _orderCrudService.DeleteEntityAsync(id);
+            if (!result)
             {
                 return NotFound();
             }
-
-            _context.Orders.Remove(order);
-            await _context.SaveChangesAsync();
-
+            
             return NoContent();
-        }
-
-        private bool OrderExists(int id)
-        {
-            return _context.Orders.Any(e => e.OrderId == id);
         }
     }
 }

@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
+using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
+using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ComputerAssemblyServiceBackEnd.Data;
 using ComputerAssemblyServiceBackEnd.Models;
+using ComputerAssemblyServiceBackEnd.Models.Dtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -14,95 +11,107 @@ namespace CompAssemblyServiceWebApi.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICrudService<User> _userCrudService;
+        private readonly IMapper _mapper;
 
-        public UserController(AppDbContext context)
+        public UserController(ICrudService<User> userCrudService, IMapper mapper)
         {
-            _context = context;
+            _userCrudService = userCrudService;
+            _mapper = mapper;
         }
 
-        // GET: api/User
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            List<User> users = await _userCrudService.GetAllEntitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<UserDto>>(users));
+        }
+        
+        [HttpGet("by-email/{email}")]
+        public async Task<ActionResult<UserDto>> GetUserByEmail(string email)
+        {
+            UsersCrudService usersCrudService = (_userCrudService as UsersCrudService)!;
+            User? user = await usersCrudService.GetUserByEmailAsync(email);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+            
+            return Ok(_mapper.Map<UserDto>(user));
+        }
+        
+        [HttpGet("by-phone-number/{phoneNumber}")]
+        public async Task<ActionResult<UserDto>> GetUserByPhoneNumber(string phoneNumber)
+        {
+            UsersCrudService usersCrudService = (_userCrudService as UsersCrudService)!;
+            User? user = await usersCrudService.GetUserByPhoneNumberAsync(phoneNumber);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+            
+            return Ok(_mapper.Map<UserDto>(user));
         }
 
-        // GET: api/User/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<UserDto>> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userCrudService.GetEntityByIdAsync(id);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            return user;
+            return Ok(_mapper.Map<UserDto>(user));
         }
-
-        // PUT: api/User/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutUser(int id, UserDto userDto)
         {
-            if (id != user.UserId)
+            if (id != userDto.UserId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            bool result = await _userCrudService.UpdateEntityAsync(id, _mapper.Map<User>(userDto));
 
-            try
+            if (!result)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            
             return NoContent();
         }
-
-        // POST: api/User
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserDto>> PostUser(UserDto userDto)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            var createdUser = _mapper.Map<User>(userDto);
+            bool result = await _userCrudService.CreateEntityAsync(createdUser);
 
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
+            if (!result)
+            {
+                return BadRequest();
+            }
+            
+            return CreatedAtAction(nameof(GetUser), new { id = createdUser.UserId },
+                _mapper.Map<UserDto>(createdUser));
         }
-
-        // DELETE: api/User/5
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            bool result = await _userCrudService.DeleteEntityAsync(id);
+
+            if (!result)
             {
                 return NotFound();
             }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
+            
             return NoContent();
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.UserId == id);
         }
     }
 }

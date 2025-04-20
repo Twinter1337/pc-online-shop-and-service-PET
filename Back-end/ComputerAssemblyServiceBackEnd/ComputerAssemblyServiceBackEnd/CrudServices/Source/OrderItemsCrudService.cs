@@ -38,4 +38,9 @@ public class OrderItemsCrudService: CrudService<OrderItem>
             .ThenInclude(p => p.Computer)
             .ToListAsync();
     }
+
+    public async Task<List<OrderItem>> GetOrderItemsByOrderIdAsync(int orderId)
+    {
+        return await Context.OrderItems.Where(oi => oi.OrderId == orderId).ToListAsync();
+    }
 }

@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
+using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
+using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ComputerAssemblyServiceBackEnd.Data;
 using ComputerAssemblyServiceBackEnd.Models;
+using ComputerAssemblyServiceBackEnd.Models.Dtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -14,95 +12,92 @@ namespace CompAssemblyServiceWebApi.Controllers
     [ApiController]
     public class ServiceController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICrudService<Service> _servicesCrudService;
+        private readonly IMapper _mapper;
 
-        public ServiceController(AppDbContext context)
+        public ServiceController(ICrudService<Service> servicesCrudService, IMapper mapper)
         {
-            _context = context;
+            _servicesCrudService = servicesCrudService;
+            _mapper = mapper;
         }
 
-        // GET: api/Service
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Service>>> GetServices()
+        public async Task<ActionResult<IEnumerable<ServiceDto>>> GetServices()
         {
-            return await _context.Services.ToListAsync();
+            List<Service> services = await _servicesCrudService.GetAllEntitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<ServiceDto>>(services));
         }
 
-        // GET: api/Service/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Service>> GetService(int id)
+        public async Task<ActionResult<ServiceDto>> GetService(int id)
         {
-            var service = await _context.Services.FindAsync(id);
+            var service = await _servicesCrudService.GetEntityByIdAsync(id);
 
             if (service == null)
             {
                 return NotFound();
             }
 
-            return service;
+            return Ok(_mapper.Map<ServiceDto>(service));
+        }
+        
+        [HttpGet("by-name/{name}")]
+        public async Task<ActionResult<ServiceDto>> GetServiceByName(string name)
+        {
+            ServicesCrudService servicesCrudService = (_servicesCrudService as ServicesCrudService)!;
+            var service = await servicesCrudService.GetServiceByNameAsync(name);
+
+            if (service == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<ServiceDto>(service));
         }
 
-        // PUT: api/Service/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutService(int id, Service service)
+        public async Task<IActionResult> PutService(int id, ServiceDto serviceDto)
         {
-            if (id != service.ServiceId)
+            if (id != serviceDto.ServiceId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(service).State = EntityState.Modified;
+            bool result = await _servicesCrudService.UpdateEntityAsync(id, _mapper.Map<Service>(serviceDto));
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ServiceExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Service
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Service>> PostService(Service service)
-        {
-            _context.Services.Add(service);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetService", new { id = service.ServiceId }, service);
-        }
-
-        // DELETE: api/Service/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteService(int id)
-        {
-            var service = await _context.Services.FindAsync(id);
-            if (service == null)
+            if (!result)
             {
                 return NotFound();
             }
 
-            _context.Services.Remove(service);
-            await _context.SaveChangesAsync();
-
             return NoContent();
         }
-
-        private bool ServiceExists(int id)
+        
+        [HttpPost]
+        public async Task<ActionResult<ServiceDto>> PostService(ServiceDto serviceDto)
         {
-            return _context.Services.Any(e => e.ServiceId == id);
+            var createdService = _mapper.Map<Service>(serviceDto);
+            bool result = await _servicesCrudService.CreateEntityAsync(createdService);
+
+            if (!result)
+            {
+                return BadRequest();
+            }
+
+            return CreatedAtAction(nameof(GetService), new { id = createdService.ServiceId },
+                _mapper.Map<ServiceDto>(createdService));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteService(int id)
+        {
+           bool result = await _servicesCrudService.DeleteEntityAsync(id);
+           if (!result)
+           {
+               return NotFound();
+           }
+           
+           return NoContent();
         }
     }
 }

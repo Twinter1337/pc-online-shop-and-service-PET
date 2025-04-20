@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
+using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
+using ComputerAssemblyServiceBackEnd.CrudServices.Source;
+using ComputerAssemblyServiceBackEnd.Enums.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ComputerAssemblyServiceBackEnd.Data;
 using ComputerAssemblyServiceBackEnd.Models;
+using ComputerAssemblyServiceBackEnd.Models.Dtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -14,95 +12,87 @@ namespace CompAssemblyServiceWebApi.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICrudService<Product> _productCrudService;
+        private readonly IMapper _mapper;
 
-        public ProductController(AppDbContext context)
+        public ProductController(ICrudService<Product> productCrudService, IMapper mapper)
         {
-            _context = context;
+            _productCrudService = productCrudService;
+            _mapper = mapper;
         }
 
-        // GET: api/Product
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            List<Product> products = await _productCrudService.GetAllEntitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<ProductDto>>(products));
         }
 
-        // GET: api/Product/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        [HttpGet("by-category")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory([FromQuery] ProductType category)
         {
-            var product = await _context.Products.FindAsync(id);
+            ProductsCrudService productsCrudService = (_productCrudService as ProductsCrudService)!;
+            List<Product> products = await productsCrudService.GetProductsByCategoryAsync(category);
+            return Ok(_mapper.Map<IEnumerable<ProductDto>>(products));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ProductDto>> GetProduct(int id)
+        {
+            var product = await _productCrudService.GetEntityByIdAsync(id);
 
             if (product == null)
             {
                 return NotFound();
             }
 
-            return product;
+            return Ok(_mapper.Map<ProductDto>(product));
         }
 
-        // PUT: api/Product/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
+        public async Task<IActionResult> PutProduct(int id, ProductDto productDto)
         {
-            if (id != product.Sku)
+            if (id != productDto.Sku)
             {
                 return BadRequest();
             }
 
-            _context.Entry(product).State = EntityState.Modified;
+            bool result = await _productCrudService.UpdateEntityAsync(id, _mapper.Map<Product>(productDto));
 
-            try
+            if (!result)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest();
             }
 
             return NoContent();
         }
 
-        // POST: api/Product
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        public async Task<ActionResult<ProductDto>> PostProduct(ProductDto productDto)
         {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
+            var createdProduct = _mapper.Map<Product>(productDto);
+            bool result = await _productCrudService.CreateEntityAsync(createdProduct);
 
-            return CreatedAtAction("GetProduct", new { id = product.Sku }, product);
+            if (!result)
+            {
+                return BadRequest();
+            }
+
+            return CreatedAtAction(nameof(GetProduct), new { id = createdProduct.Sku },
+                _mapper.Map<ProductDto>(createdProduct));
         }
 
-        // DELETE: api/Product/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
+            bool result = await _productCrudService.DeleteEntityAsync(id);
+
+            if (!result)
             {
                 return NotFound();
             }
 
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.Sku == id);
         }
     }
 }

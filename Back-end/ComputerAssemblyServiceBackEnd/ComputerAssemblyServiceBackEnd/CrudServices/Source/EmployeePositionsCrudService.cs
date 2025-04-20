@@ -11,7 +11,7 @@ public class EmployeePositionsCrudService : CrudService<EmployeePosition>
     {
     }
 
-    public async Task<EmployeePosition> GetEmployeePositionByNameAsync(string name)
+    public async Task<EmployeePosition?> GetEmployeePositionByNameAsync(string name)
     {
         return await Context.EmployeePositions.FirstOrDefaultAsync(ep => ep.PositionName == name) ?? throw new InvalidOperationException();
     }

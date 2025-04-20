@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
+using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
+using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ComputerAssemblyServiceBackEnd.Data;
 using ComputerAssemblyServiceBackEnd.Models;
+using ComputerAssemblyServiceBackEnd.Models.Dtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -14,95 +11,94 @@ namespace CompAssemblyServiceWebApi.Controllers
     [ApiController]
     public class EmployeePositionController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICrudService<EmployeePosition> _employeePositionCrudService;
+        private readonly IMapper _mapper;
 
-        public EmployeePositionController(AppDbContext context)
+        public EmployeePositionController(ICrudService<EmployeePosition> employeePositionCrudService, IMapper mapper)
         {
-            _context = context;
+            _employeePositionCrudService = employeePositionCrudService;
+            _mapper = mapper;
         }
 
-        // GET: api/EmployeePosition
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EmployeePosition>>> GetEmployeePositions()
+        public async Task<ActionResult<IEnumerable<EmployeePositionDto>>> GetEmployeePositions()
         {
-            return await _context.EmployeePositions.ToListAsync();
+            List<EmployeePosition> employeePosition = await _employeePositionCrudService.GetAllEntitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<EmployeePositionDto>>(employeePosition));
         }
 
-        // GET: api/EmployeePosition/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<EmployeePosition>> GetEmployeePosition(int id)
+        public async Task<ActionResult<EmployeePositionDto>> GetEmployeePosition(int id)
         {
-            var employeePosition = await _context.EmployeePositions.FindAsync(id);
+            var employeePosition = await _employeePositionCrudService.GetEntityByIdAsync(id);
 
             if (employeePosition == null)
             {
                 return NotFound();
             }
 
-            return employeePosition;
+            return Ok(_mapper.Map<EmployeePositionDto>(employeePosition));
         }
 
-        // PUT: api/EmployeePosition/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployeePosition(int id, EmployeePosition employeePosition)
+        [HttpGet("by-name/{name}")]
+        public async Task<ActionResult<EmployeePositionDto>> GetEmployeePositionByName(string name)
         {
-            if (id != employeePosition.PositionId)
+            EmployeePositionsCrudService employeePositionsCrudService =
+                (_employeePositionCrudService as EmployeePositionsCrudService)!;
+            var employeePosition = await employeePositionsCrudService.GetEmployeePositionByNameAsync(name);
+
+            if (employeePosition == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<EmployeePositionDto>(employeePosition));
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutEmployeePosition(int id, EmployeePositionDto employeePositionDto)
+        {
+            if (id != employeePositionDto.PositionId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(employeePosition).State = EntityState.Modified;
+            bool result = await _employeePositionCrudService.UpdateEntityAsync(id,
+                _mapper.Map<EmployeePosition>(employeePositionDto));
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EmployeePositionExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/EmployeePosition
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<EmployeePosition>> PostEmployeePosition(EmployeePosition employeePosition)
-        {
-            _context.EmployeePositions.Add(employeePosition);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetEmployeePosition", new { id = employeePosition.PositionId }, employeePosition);
-        }
-
-        // DELETE: api/EmployeePosition/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployeePosition(int id)
-        {
-            var employeePosition = await _context.EmployeePositions.FindAsync(id);
-            if (employeePosition == null)
+            if (!result)
             {
                 return NotFound();
             }
-
-            _context.EmployeePositions.Remove(employeePosition);
-            await _context.SaveChangesAsync();
-
+            
             return NoContent();
         }
 
-        private bool EmployeePositionExists(int id)
+        [HttpPost]
+        public async Task<ActionResult<EmployeePositionDto>> PostEmployeePosition(EmployeePositionDto employeePositionDto)
         {
-            return _context.EmployeePositions.Any(e => e.PositionId == id);
+            var createdEmployeePosition = _mapper.Map<EmployeePosition>(employeePositionDto);
+            bool result = await _employeePositionCrudService.CreateEntityAsync(createdEmployeePosition);
+            
+            if (!result)
+            {
+                return BadRequest();
+            }
+
+            return CreatedAtAction(nameof(GetEmployeePosition), new { id = createdEmployeePosition.PositionId },
+                _mapper.Map<EmployeeDto>(createdEmployeePosition));
+        }
+        
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEmployeePosition(int id)
+        {
+            bool result = await _employeePositionCrudService.DeleteEntityAsync(id);
+            if (!result)
+            {
+                return NotFound();
+            }
+            
+            return NoContent();
         }
     }
 }

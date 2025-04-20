@@ -33,9 +33,9 @@ public class ComputersOnCrudServiceCrudService : CrudService<ComputerOnService>
         ;
     }
 
-    public async Task<ComputerOnService> GetComputerOnServiceByUserIdAsync(int userId)
+    public async Task<List<ComputerOnService>> GetComputersOnServiceByUserIdAsync(int userId)
     {
-        return await Context.ComputersOnService.FirstOrDefaultAsync(c => c.UserId == userId) ??
+        return await Context.ComputersOnService.Where(c => c.UserId == userId).ToListAsync() ??
                throw new InvalidOperationException();
     }
 }
