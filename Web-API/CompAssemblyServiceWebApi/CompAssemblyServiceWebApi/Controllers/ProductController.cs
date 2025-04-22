@@ -4,7 +4,8 @@ using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using ComputerAssemblyServiceBackEnd.Enums.Models;
 using Microsoft.AspNetCore.Mvc;
 using ComputerAssemblyServiceBackEnd.Models;
-using ComputerAssemblyServiceBackEnd.Models.Dtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.PatchDtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.ProductDtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -24,80 +25,154 @@ namespace CompAssemblyServiceWebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
         {
-            List<Product> products = await _productCrudService.GetAllEntitiesAsync();
-            return Ok(_mapper.Map<IEnumerable<ProductDto>>(products));
+            try
+            {
+                var products = await _productCrudService.GetAllEntitiesAsync();
+                return Ok(_mapper.Map<IEnumerable<ProductDto>>(products));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error retrieving products: {ex.Message}");
+            }
         }
 
         [HttpGet("by-category/{category}")]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory([FromRoute] ProductType category)
         {
-            ProductsCrudService productsCrudService = (_productCrudService as ProductsCrudService)!;
-            List<Product> products = await productsCrudService.GetProductsByCategoryAsync(category);
-            return Ok(_mapper.Map<IEnumerable<ProductDto>>(products));
+            try
+            {
+                if (_productCrudService is not ProductsCrudService productsService)
+                    return StatusCode(500, "Cannot cast to ProductsCrudService");
+
+                var products = await productsService.GetProductsByCategoryAsync(category);
+                return Ok(_mapper.Map<IEnumerable<ProductDto>>(products));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error filtering products: {ex.Message}");
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDto>> GetProduct(int id)
         {
-            var product = await _productCrudService.GetEntityByIdAsync(id);
-
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(_mapper.Map<ProductDto>(product));
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, ProductDto productDto)
-        {
-            if (id != productDto.Sku)
-            {
-                return BadRequest();
-            }
-
-            bool result = await _productCrudService.UpdateEntityAsync(id, _mapper.Map<Product>(productDto));
-
-            if (!result)
-            {
-                return BadRequest();
-            }
-
-            return NoContent();
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<ProductDto>> PostProduct(ProductDto productDto)
-        {
             try
             {
-                var createdProduct = _mapper.Map<Product>(productDto);
-                bool result = await _productCrudService.CreateEntityAsync(createdProduct);
+                var product = await _productCrudService.GetEntityByIdAsync(id);
+                if (product == null)
+                    return NotFound();
 
-                if (!result)
-                    return BadRequest();
-
-                return CreatedAtAction(nameof(GetProduct), new { id = createdProduct.Sku },
-                    _mapper.Map<ProductDto>(createdProduct));
+                return Ok(_mapper.Map<ProductDto>(product));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, $"Error retrieving product: {ex.Message}");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutProduct(int id, ProductUpdateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var validationResult = await ValidateProductIdsAsync(dto.ComponentId, dto.ComputerId);
+                if (validationResult != null)
+                    return validationResult;
+
+                if (_productCrudService is not ProductsCrudService pcs)
+                    return StatusCode(500, "Product service is not available");
+
+                bool result = await pcs.UpdateEntityAsync(id, dto);
+                return result ? NoContent() : BadRequest("Update failed due to invalid input or constraint violation.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error updating product: {ex.Message}");
+            }
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchProduct(int id, ProductPatchDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                bool result = await _productCrudService.PatchEntityAsync(id, dto);
+                return result ? NoContent() : BadRequest("Patch failed");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error patching product: {ex.Message}");
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ProductDto>> PostProduct(ProductCreateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var validationResult = await ValidateProductIdsAsync(dto.ComponentId, dto.ComputerId);
+                if (validationResult != null)
+                    return validationResult;
+
+                var entity = _mapper.Map<Product>(dto);
+                bool result = await _productCrudService.CreateEntityAsync(entity);
+
+                if (!result)
+                    return BadRequest("Creation failed");
+
+                return CreatedAtAction(nameof(GetProduct), new { id = entity.Sku }, _mapper.Map<ProductDto>(entity));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error creating product: {ex.Message}");
             }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            bool result = await _productCrudService.DeleteEntityAsync(id);
-
-            if (!result)
+            try
             {
-                return NotFound();
+                var result = await _productCrudService.DeleteEntityAsync(id);
+                return result ? NoContent() : NotFound($"Product with ID {id} not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error deleting product: {ex.Message}");
+            }
+        }
+
+        private async Task<ActionResult> ValidateProductIdsAsync(int? componentId, int? computerId)
+        {
+            if (componentId != null && computerId != null)
+                return BadRequest("Product can have either ComponentId or ComputerId, not both");
+
+            if (componentId != null)
+            {
+                var componentService = new ComponentsCrudService(_productCrudService.Context);
+                var component = await componentService.GetEntityByIdAsync(componentId.Value);
+                if (component == null)
+                    return NotFound($"Component with ID {componentId} not found");
             }
 
-            return NoContent();
+            if (computerId != null)
+            {
+                var computerService = new PrebuildPatternsCrudService(_productCrudService.Context);
+                var computer = await computerService.GetEntityByIdAsync(computerId.Value);
+                if (computer == null)
+                    return NotFound($"Computer with ID {computerId} not found");
+            }
+
+            return null;
         }
     }
 }

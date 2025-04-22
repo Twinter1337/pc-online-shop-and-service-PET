@@ -169,7 +169,9 @@ public class MappingProfile : Profile
         #region Product
 
         CreateMap<Product, ProductDto>().ReverseMap();
-        CreateMap<Product, ProductCreateDto>().ReverseMap();
+        CreateMap<Product, ProductCreateDto>().ReverseMap()
+            .ForMember(dest => dest.ComputerId, opt => opt.Condition(src => src.ComputerId != null))
+            .ForMember(dest => dest.ComponentId, opt => opt.Condition(src => src.ComponentId != null));
         CreateMap<Product, ProductUpdateDto>().ReverseMap();
         CreateMap<Product, ProductPatchDto>().ReverseMap();
 

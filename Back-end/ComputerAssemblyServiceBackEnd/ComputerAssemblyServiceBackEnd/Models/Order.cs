@@ -15,6 +15,8 @@ public partial class Order
     public DateOnly CreatedAt { get; set; }
     
     public OrderStatus Status { get; set; }
+    
+    public virtual User? Client { get; set; }
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 

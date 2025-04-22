@@ -4,7 +4,8 @@ using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using Microsoft.AspNetCore.Mvc;
 using ComputerAssemblyServiceBackEnd.Filters.Models;
 using ComputerAssemblyServiceBackEnd.Models;
-using ComputerAssemblyServiceBackEnd.Models.Dtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.OrderDtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.PatchDtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -24,74 +25,174 @@ namespace CompAssemblyServiceWebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrders()
         {
-            List<Order> orders = await _orderCrudService.GetAllEntitiesAsync();
-            return Ok(_mapper.Map<IEnumerable<OrderDto>>(orders));
+            try
+            {
+                var orders = await _orderCrudService.GetAllEntitiesAsync();
+                return Ok(_mapper.Map<IEnumerable<OrderDto>>(orders));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet("filter")]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetFilteredOrders([FromQuery] OrderFilter filter)
         {
-            OrdersCrudService ordersCrudService = (_orderCrudService as OrdersCrudService)!;
-            List<Order> orders = await ordersCrudService.GetFilteredOrdersAsync(filter);
-            return Ok(_mapper.Map<IEnumerable<OrderDto>>(orders));
+            try
+            {
+                var ordersCrudService = (_orderCrudService as OrdersCrudService)!;
+                var orders = await ordersCrudService.GetFilteredOrdersAsync(filter);
+                return Ok(_mapper.Map<IEnumerable<OrderDto>>(orders));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderDto>> GetOrder(int id)
         {
-            var order = await _orderCrudService.GetEntityByIdAsync(id);
-
-            if (order == null)
+            try
             {
-                return NotFound();
-            }
+                var order = await _orderCrudService.GetEntityByIdAsync(id);
 
-            return Ok(_mapper.Map<OrderDto>(order));
+                if (order == null)
+                {
+                    return NotFound($"Order with ID {id} not found.");
+                }
+
+                return Ok(_mapper.Map<OrderDto>(order));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-        
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder(int id, OrderDto orderDto)
+        public async Task<IActionResult> PutOrder(int id, OrderUpdateDto orderUpdateDto)
         {
-            if (id != orderDto.OrderId)
-            {
-                return BadRequest();
-            }
-
-            bool result = await _orderCrudService.UpdateEntityAsync(id, _mapper.Map<Order>(orderDto));
-
-            if (!result)
-            {
-                return BadRequest();
-            }
-
-            return NoContent();
-        }
-        
-        [HttpPost]
-        public async Task<ActionResult<OrderDto>> PostOrder(OrderDto orderDto)
-        {
-            var createdOrder = _mapper.Map<Order>(orderDto);
-            bool result = await _orderCrudService.CreateEntityAsync(createdOrder);
-
-            if (!result)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             
-            return CreatedAtAction(nameof(GetOrder), new {id = createdOrder.OrderId},
-                _mapper.Map<OrderDto>(createdOrder));
+            try
+            {
+                if (orderUpdateDto.ClientId != null)
+                {
+                    var ucs = new UsersCrudService(_orderCrudService.Context);
+                    var client = await ucs.GetEntityByIdAsync((int)orderUpdateDto.ClientId);
+
+                    if (client == null)
+                    {
+                        return NotFound($"Client with ID {orderUpdateDto.ClientId} not found.");
+                    }
+                }
+
+                bool result = await _orderCrudService.UpdateEntityAsync(id, orderUpdateDto);
+
+                if (!result)
+                {
+                    return NotFound($"Order with ID {id} not found.");
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-        
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PutOrder(int id, OrderPatchDto orderPatchDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            try
+            {
+                if (orderPatchDto.ClientId != null)
+                {
+                    var ucs = new UsersCrudService(_orderCrudService.Context);
+                    var client = await ucs.GetEntityByIdAsync((int)orderPatchDto.ClientId);
+
+                    if (client == null)
+                    {
+                        return NotFound($"Client with ID {orderPatchDto.ClientId} not found.");
+                    }
+                }
+
+                bool result = await _orderCrudService.PatchEntityAsync(id, orderPatchDto);
+
+                if (!result)
+                {
+                    return NotFound($"Order with ID {id} not found.");
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<OrderDto>> PostOrder(OrderCreateDto orderCreateDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            try
+            {
+                if (orderCreateDto.ClientId != null)
+                {
+                    var ucs = new UsersCrudService(_orderCrudService.Context);
+                    var client = await ucs.GetEntityByIdAsync((int)orderCreateDto.ClientId);
+
+                    if (client == null)
+                    {
+                        return NotFound($"Client with ID {orderCreateDto.ClientId} not found.");
+                    }
+                }
+
+                var createdOrder = _mapper.Map<Order>(orderCreateDto);
+                bool result = await _orderCrudService.CreateEntityAsync(createdOrder);
+
+                if (!result)
+                {
+                    return BadRequest("Failed to create the order.");
+                }
+
+                return CreatedAtAction(nameof(GetOrder), new { id = createdOrder.OrderId },
+                    _mapper.Map<OrderDto>(createdOrder));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrder(int id)
         {
-            bool result = await _orderCrudService.DeleteEntityAsync(id);
-            if (!result)
+            try
             {
-                return NotFound();
+                bool result = await _orderCrudService.DeleteEntityAsync(id);
+
+                if (!result)
+                {
+                    return NotFound($"Order with ID {id} not found.");
+                }
+
+                return NoContent();
             }
-            
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

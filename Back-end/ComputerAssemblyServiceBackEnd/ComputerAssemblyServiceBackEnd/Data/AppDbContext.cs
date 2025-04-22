@@ -312,6 +312,14 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Status)
                 .HasColumnName("status")
                 .HasColumnType("order_status");
+
+            entity.Property(e => e.ClientId) 
+                .HasColumnName("client_id");
+
+            entity.HasOne(d => d.Client)
+                .WithMany(p => p.Orders)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("orders_client_id_fkey"); 
         });
 
         modelBuilder.Entity<PatternComponent>(entity =>

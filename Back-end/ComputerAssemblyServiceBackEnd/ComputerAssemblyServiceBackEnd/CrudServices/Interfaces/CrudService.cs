@@ -1,4 +1,5 @@
 using ComputerAssemblyServiceBackEnd.Data;
+using ComputerAssemblyServiceBackEnd.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
@@ -46,20 +47,50 @@ public abstract class CrudService<T> : ICrudService<T> where T : class
         return await Context.Set<T>().FindAsync(id);
     }
 
-    public virtual async Task<bool> UpdateEntityAsync(int id, T entity) 
+    public virtual async Task<bool> UpdateEntityAsync<TDto>(int id, TDto updateDto)
     {
         var dbSet = Context.Set<T>();
-        
+
         var existingEntity = await dbSet.FindAsync(id);
         if (existingEntity == null)
             return false;
-        
-        Context.Entry(existingEntity).CurrentValues.SetValues(entity);
+
+        var updateProperties = typeof(TDto).GetProperties();
+
+        foreach (var property in updateProperties)
+        {
+            var entityProperty = typeof(T).GetProperty(property.Name);
+            if (entityProperty != null && entityProperty.CanWrite)
+            {
+                var value = property.GetValue(updateDto);
+
+                if (entityProperty.PropertyType.IsEnum && value != null)
+                {
+                    try
+                    {
+                        var enumValue = Enum.Parse(entityProperty.PropertyType, value.ToString());
+                        entityProperty.SetValue(existingEntity, enumValue);
+                    }
+                    catch (ArgumentException)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (value != null)
+                    {
+                        entityProperty.SetValue(existingEntity, value);
+                    }
+                }
+            }
+        }
+
+        Context.Entry(existingEntity).CurrentValues.SetValues(existingEntity);
 
         await Context.SaveChangesAsync();
         return true;
     }
-
     public async Task<bool> PatchEntityAsync<TPatchDto>(int id, TPatchDto patchDto)
     {
         var dbSet = Context.Set<T>();

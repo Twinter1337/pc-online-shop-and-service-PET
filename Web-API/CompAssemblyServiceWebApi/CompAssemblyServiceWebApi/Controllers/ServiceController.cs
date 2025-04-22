@@ -2,9 +2,9 @@ using AutoMapper;
 using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
 using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ComputerAssemblyServiceBackEnd.Models;
-using ComputerAssemblyServiceBackEnd.Models.Dtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.PatchDtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.ServiceDtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -24,80 +24,133 @@ namespace CompAssemblyServiceWebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ServiceDto>>> GetServices()
         {
-            List<Service> services = await _servicesCrudService.GetAllEntitiesAsync();
-            return Ok(_mapper.Map<IEnumerable<ServiceDto>>(services));
+            try
+            {
+                var services = await _servicesCrudService.GetAllEntitiesAsync();
+                return Ok(_mapper.Map<IEnumerable<ServiceDto>>(services));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error fetching services: {ex.Message}");
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ServiceDto>> GetService(int id)
         {
-            var service = await _servicesCrudService.GetEntityByIdAsync(id);
-
-            if (service == null)
+            try
             {
-                return NotFound();
-            }
+                var service = await _servicesCrudService.GetEntityByIdAsync(id);
+                if (service == null)
+                    return NotFound();
 
-            return Ok(_mapper.Map<ServiceDto>(service));
+                return Ok(_mapper.Map<ServiceDto>(service));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error fetching service: {ex.Message}");
+            }
         }
-        
+
         [HttpGet("by-name/{name}")]
         public async Task<ActionResult<ServiceDto>> GetServiceByName(string name)
         {
-            ServicesCrudService servicesCrudService = (_servicesCrudService as ServicesCrudService)!;
-            var service = await servicesCrudService.GetServiceByNameAsync(name);
-
-            if (service == null)
+            try
             {
-                return NotFound();
-            }
+                var servicesCrudService = _servicesCrudService as ServicesCrudService;
+                if (servicesCrudService == null)
+                    return StatusCode(500, "Service logic not available");
 
-            return Ok(_mapper.Map<ServiceDto>(service));
+                var service = await servicesCrudService.GetServiceByNameAsync(name);
+                if (service == null)
+                    return NotFound();
+
+                return Ok(_mapper.Map<ServiceDto>(service));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error fetching service by name: {ex.Message}");
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutService(int id, ServiceDto serviceDto)
+        public async Task<IActionResult> PutService(int id, ServiceUpdateDto serviceUpdateDto)
         {
-            if (id != serviceDto.ServiceId)
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            try
             {
-                return BadRequest();
+                var result = await _servicesCrudService.UpdateEntityAsync(id, serviceUpdateDto);
+                if (!result)
+                    return NotFound();
+
+                return NoContent();
             }
-
-            bool result = await _servicesCrudService.UpdateEntityAsync(id, _mapper.Map<Service>(serviceDto));
-
-            if (!result)
+            catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(500, $"Error updating service: {ex.Message}");
             }
-
-            return NoContent();
         }
-        
-        [HttpPost]
-        public async Task<ActionResult<ServiceDto>> PostService(ServiceDto serviceDto)
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchService(int id, ServicePatchDto servicePatchDto)
         {
-            var createdService = _mapper.Map<Service>(serviceDto);
-            bool result = await _servicesCrudService.CreateEntityAsync(createdService);
-
-            if (!result)
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            try
             {
-                return BadRequest();
-            }
+                var result = await _servicesCrudService.PatchEntityAsync(id, servicePatchDto);
+                if (!result)
+                    return NotFound();
 
-            return CreatedAtAction(nameof(GetService), new { id = createdService.ServiceId },
-                _mapper.Map<ServiceDto>(createdService));
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error patching service: {ex.Message}");
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ServiceDto>> PostService(ServiceCreateDto serviceCreateDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            try
+            {
+                var createdService = _mapper.Map<Service>(serviceCreateDto);
+                var result = await _servicesCrudService.CreateEntityAsync(createdService);
+
+                if (!result)
+                    return BadRequest("Failed to create service");
+
+                return CreatedAtAction(nameof(GetService), new { id = createdService.ServiceId },
+                    _mapper.Map<ServiceDto>(createdService));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error creating service: {ex.Message}");
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteService(int id)
         {
-           bool result = await _servicesCrudService.DeleteEntityAsync(id);
-           if (!result)
-           {
-               return NotFound();
-           }
-           
-           return NoContent();
+            try
+            {
+                var result = await _servicesCrudService.DeleteEntityAsync(id);
+                if (!result)
+                    return NotFound();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error deleting service: {ex.Message}");
+            }
         }
     }
 }

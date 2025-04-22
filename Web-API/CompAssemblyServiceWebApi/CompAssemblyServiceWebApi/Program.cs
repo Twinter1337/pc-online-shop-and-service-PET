@@ -15,7 +15,6 @@ using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ===== Add services to container =====
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost5173", policy =>
@@ -35,7 +34,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMemoryCache();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-// ===== Database Configuration =====
 var dataSourceBuilder = new NpgsqlDataSourceBuilder(builder.Configuration.GetConnectionString("DefaultConnection"));
 dataSourceBuilder.MapEnum<ComponentType>("component_type");
 dataSourceBuilder.MapEnum<OrderStatus>("order_status");
@@ -61,7 +59,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
             o.MapEnum<UserRole>("user_role");
         }));
 
-// ===== JWT Configuration =====
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key is not configured");
 var key = Encoding.ASCII.GetBytes(jwtKey);
 
@@ -83,10 +80,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ===== Dependency Injection =====
 builder.Services.AddScoped<OtpService>();
 builder.Services.AddScoped<ICrudService<Component>, ComponentsCrudService>();
-builder.Services.AddScoped<ICrudService<ComputerOnService>, ComputersOnCrudServiceCrudService>();
+builder.Services.AddScoped<ICrudService<ComputerOnService>, ComputersOnServiceCrudService>();
 builder.Services.AddScoped<ICrudService<Payment>, PaymentsCrudService>();
 builder.Services.AddScoped<ICrudService<PrebuildPattern>, PrebuildPatternsCrudService>();
 builder.Services.AddScoped<ICrudService<PatternComponent>, PatternComponentsCrudService>();
@@ -99,7 +95,6 @@ builder.Services.AddScoped<ICrudService<Employee>, EmployeesCrudService>();
 builder.Services.AddScoped<ICrudService<EmployeePosition>, EmployeePositionsCrudService>();
 builder.Services.AddScoped<ICrudService<Product>, ProductsCrudService>();
 
-// ===== Swagger Configuration =====
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -114,7 +109,6 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    // Add JWT Authentication support in Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -140,7 +134,6 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    // Include XML comments if available
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath))
@@ -153,7 +146,6 @@ var app = builder.Build();
 
 app.UseCors("AllowLocalhost5173");
 
-// ===== Middleware Pipeline =====
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -174,7 +166,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// ===== Database Migration =====
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

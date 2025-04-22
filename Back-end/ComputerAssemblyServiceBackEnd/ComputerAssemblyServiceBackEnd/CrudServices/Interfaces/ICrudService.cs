@@ -8,7 +8,7 @@ public interface ICrudService<T> where T : class
     Task<bool> CreateEntityAsync(T entity);
     Task<List<T>> GetAllEntitiesAsync();
     Task<T?> GetEntityByIdAsync(int id);
-    Task<bool> UpdateEntityAsync(int id, T entity);
+    Task<bool> UpdateEntityAsync<TDto>(int id, TDto entity);
     Task<bool> PatchEntityAsync<TPatchDto>(int id, TPatchDto patchDto);
     Task<bool> DeleteEntityAsync(int id);
 }

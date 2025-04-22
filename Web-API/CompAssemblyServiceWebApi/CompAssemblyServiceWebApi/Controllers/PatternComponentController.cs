@@ -3,7 +3,8 @@ using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
 using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using Microsoft.AspNetCore.Mvc;
 using ComputerAssemblyServiceBackEnd.Models;
-using ComputerAssemblyServiceBackEnd.Models.Dtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.PatchDtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.PatternComponentDtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -23,82 +24,178 @@ namespace CompAssemblyServiceWebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PatternComponentDto>>> GetPatternComponents()
         {
-            List<PatternComponent> patternComponents = await _patternComponentCrudService.GetAllEntitiesAsync();
-            return Ok(_mapper.Map<IEnumerable<PatternComponentDto>>(patternComponents));
+            try
+            {
+                var patternComponents = await _patternComponentCrudService.GetAllEntitiesAsync();
+                return Ok(_mapper.Map<IEnumerable<PatternComponentDto>>(patternComponents));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet("by-prebuild/{prebuildId}")]
-        public async Task<ActionResult<IEnumerable<PatternComponentDto>>> GetPatternComponentsByPrebuildPatternId(
-            int prebuildId)
+        public async Task<ActionResult<IEnumerable<PatternComponentDto>>> GetPatternComponentsByPrebuildPatternId(int prebuildId)
         {
-            PatternComponentsCrudService patternComponentCrudService =
-                (_patternComponentCrudService as PatternComponentsCrudService)!;
-            List<PatternComponent> patternComponents =
-                await patternComponentCrudService.GetPatternComponentsByPrebuildPatternIdAsync(prebuildId);
-            
-            return Ok(_mapper.Map<IEnumerable<PatternComponentDto>>(patternComponents));
+            try
+            {
+                var patternComponentService = _patternComponentCrudService as PatternComponentsCrudService;
+                if (patternComponentService == null)
+                    return StatusCode(500, "Internal service error: Unable to cast to PatternComponentsCrudService");
+
+                var patternComponents = await patternComponentService.GetPatternComponentsByPrebuildPatternIdAsync(prebuildId);
+                return Ok(_mapper.Map<IEnumerable<PatternComponentDto>>(patternComponents));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<PatternComponentDto>> GetPatternComponent(int id)
         {
-            var patternComponent = await _patternComponentCrudService.GetEntityByIdAsync(id);
-
-            if (patternComponent == null)
+            try
             {
-                return NotFound();
-            }
+                var patternComponent = await _patternComponentCrudService.GetEntityByIdAsync(id);
+                if (patternComponent == null)
+                    return NotFound($"PatternComponent with ID {id} not found.");
 
-            return Ok(_mapper.Map<PatternComponentDto>(patternComponent));
+                return Ok(_mapper.Map<PatternComponentDto>(patternComponent));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPatternComponent(int id, PatternComponentDto patternComponentDto)
+        public async Task<IActionResult> PutPatternComponent(int id, PatternComponentUpdateDto dto)
         {
-            if (id != patternComponentDto.PatternComponentId)
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
             {
-                return BadRequest();
+                if (dto.PatternId != null)
+                {
+                    var ppcs = new PrebuildPatternsCrudService(_patternComponentCrudService.Context);
+                    var pb = await ppcs.GetEntityByIdAsync(dto.PatternId);
+                    if (pb == null)
+                        return NotFound($"Prebuild pattern with ID {dto.PatternId} not found.");
+                }
+
+                if (dto.ComponentId != null)
+                {
+                    var ccs = new ComponentsCrudService(_patternComponentCrudService.Context);
+                    var component = await ccs.GetEntityByIdAsync(dto.ComponentId);
+                    if (component == null)
+                        return NotFound($"Component with ID {dto.ComponentId} not found.");
+                }
+
+                var result = await _patternComponentCrudService.UpdateEntityAsync(id, dto);
+                if (!result)
+                    return BadRequest($"Failed to update PatternComponent with ID {id}.");
+
+                return NoContent();
             }
-
-            bool result =
-                await _patternComponentCrudService.UpdateEntityAsync(id,
-                    _mapper.Map<PatternComponent>(patternComponentDto));
-
-            if (!result)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
+        }
 
-            return NoContent();
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchPatternComponent(int id, PatternComponentPatchDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                if (dto.PatternId != null)
+                {
+                    var ppcs = new PrebuildPatternsCrudService(_patternComponentCrudService.Context);
+                    var pb = await ppcs.GetEntityByIdAsync((int)dto.PatternId);
+                    if (pb == null)
+                        return NotFound($"Prebuild pattern with ID {dto.PatternId} not found.");
+                }
+
+                if (dto.ComponentId != null)
+                {
+                    var ccs = new ComponentsCrudService(_patternComponentCrudService.Context);
+                    var component = await ccs.GetEntityByIdAsync((int)dto.ComponentId);
+                    if (component == null)
+                        return NotFound($"Component with ID {dto.ComponentId} not found.");
+                }
+
+                var result = await _patternComponentCrudService.PatchEntityAsync(id, dto);
+                if (!result)
+                    return BadRequest($"Failed to patch PatternComponent with ID {id}.");
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<PatternComponentDto>> PostPatternComponent(
-            PatternComponentDto patternComponentDto)
+        public async Task<ActionResult<PatternComponentDto>> PostPatternComponent(PatternComponentCreateDto dto)
         {
-            var createdPatternComponent = _mapper.Map<PatternComponent>(patternComponentDto);
-            bool result = await _patternComponentCrudService.CreateEntityAsync(createdPatternComponent);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            if (!result)
+            try
             {
-                return BadRequest();
-            }
+                if (dto.PatternId != null)
+                {
+                    var ppcs = new PrebuildPatternsCrudService(_patternComponentCrudService.Context);
+                    var pb = await ppcs.GetEntityByIdAsync(dto.PatternId);
+                    if (pb == null)
+                        return NotFound($"Prebuild pattern with ID {dto.PatternId} not found.");
+                }
 
-            return CreatedAtAction(nameof(GetPatternComponent), new { id = createdPatternComponent.PatternComponentId },
-                _mapper.Map<PatternComponentDto>(createdPatternComponent));
+                if (dto.ComponentId != null)
+                {
+                    var ccs = new ComponentsCrudService(_patternComponentCrudService.Context);
+                    var component = await ccs.GetEntityByIdAsync(dto.ComponentId);
+                    if (component == null)
+                        return NotFound($"Component with ID {dto.ComponentId} not found.");
+                }
+
+                var created = _mapper.Map<PatternComponent>(dto);
+                var result = await _patternComponentCrudService.CreateEntityAsync(created);
+
+                if (!result)
+                    return BadRequest("Failed to create PatternComponent.");
+
+                return CreatedAtAction(nameof(GetPatternComponent), new { id = created.PatternComponentId },
+                    _mapper.Map<PatternComponentDto>(created));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePatternComponent(int id)
         {
-            bool result = await _patternComponentCrudService.DeleteEntityAsync(id);
-
-            if (!result)
+            try
             {
-                return NotFound();
-            }
+                var result = await _patternComponentCrudService.DeleteEntityAsync(id);
+                if (!result)
+                    return NotFound($"PatternComponent with ID {id} not found.");
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

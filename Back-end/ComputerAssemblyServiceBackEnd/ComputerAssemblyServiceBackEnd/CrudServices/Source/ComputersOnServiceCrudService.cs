@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ComputerAssemblyServiceBackEnd.CrudServices.Source;
 
-public class ComputersOnCrudServiceCrudService : CrudService<ComputerOnService>
+public class ComputersOnServiceCrudService : CrudService<ComputerOnService>
 {
-    public ComputersOnCrudServiceCrudService(AppDbContext context) : base(context)
+    public ComputersOnServiceCrudService(AppDbContext context) : base(context)
     {
     }
 

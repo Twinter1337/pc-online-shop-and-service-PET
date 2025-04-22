@@ -36,6 +36,16 @@ public class OrdersCrudService: CrudService<Order>
             query = query.Where(o => o.TotalAmount >= filter.MinAmount);
         }
         
+        if (filter.MinCreationDate.HasValue)
+        {
+            query = query.Where(o => o.CreatedAt >= filter.MinCreationDate);
+        }
+        
+        if (filter.MaxCreatioDate.HasValue)
+        {
+            query = query.Where(o => o.CreatedAt <= filter.MaxCreatioDate);
+        }
+        
         return await query.Include(o => o.OrderItems)
             .ThenInclude(oi => oi.Product)
             .Include(o => o.OrderServices)

@@ -4,7 +4,8 @@ using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using ComputerAssemblyServiceBackEnd.Filters.Models;
 using Microsoft.AspNetCore.Mvc;
 using ComputerAssemblyServiceBackEnd.Models;
-using ComputerAssemblyServiceBackEnd.Models.Dtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.PatchDtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.PaymentDtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -24,83 +25,169 @@ namespace CompAssemblyServiceWebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PaymentDto>>> GetPayments()
         {
-            List<Payment> payments = await _paymentCrudService.GetAllEntitiesAsync();
-            return Ok(_mapper.Map<IEnumerable<PaymentDto>>(payments));
+            try
+            {
+                var payments = await _paymentCrudService.GetAllEntitiesAsync();
+                return Ok(_mapper.Map<IEnumerable<PaymentDto>>(payments));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-        
+
         [HttpGet("by-order/{orderId}")]
         public async Task<ActionResult<IEnumerable<PaymentDto>>> GetPaymentsByOrderId(int orderId)
         {
-            PaymentsCrudService paymentsCrudService = (_paymentCrudService as PaymentsCrudService)!;
-            List<Payment> payments = await paymentsCrudService.GetPaymentsByOrderIdAsync(orderId);
-            return Ok(_mapper.Map<IEnumerable<PaymentDto>>(payments));
+            try
+            {
+                if (_paymentCrudService is not PaymentsCrudService paymentsService)
+                    return StatusCode(500, "Internal service error: cannot cast to PaymentsCrudService");
+
+                var payments = await paymentsService.GetPaymentsByOrderIdAsync(orderId);
+                return Ok(_mapper.Map<IEnumerable<PaymentDto>>(payments));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-        
+
         [HttpGet("filter")]
         public async Task<ActionResult<IEnumerable<PaymentDto>>> GetFilteredPayments([FromQuery] PaymentFilter filter)
         {
-            PaymentsCrudService paymentsCrudService = (_paymentCrudService as PaymentsCrudService)!;
-            List<Payment> payments = await paymentsCrudService.GetFilteredPaymentsAsync(filter);
-            return Ok(_mapper.Map<IEnumerable<PaymentDto>>(payments));
+            try
+            {
+                if (_paymentCrudService is not PaymentsCrudService paymentsService)
+                    return StatusCode(500, "Internal service error: cannot cast to PaymentsCrudService");
+
+                var payments = await paymentsService.GetFilteredPaymentsAsync(filter);
+                return Ok(_mapper.Map<IEnumerable<PaymentDto>>(payments));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<PaymentDto>> GetPayment(int id)
         {
-            var payment = await _paymentCrudService.GetEntityByIdAsync(id);
-
-            if (payment == null)
+            try
             {
-                return NotFound();
-            }
+                var payment = await _paymentCrudService.GetEntityByIdAsync(id);
+                if (payment == null)
+                    return NotFound($"Payment with ID {id} not found");
 
-            return Ok(_mapper.Map<PaymentDto>(payment));
+                return Ok(_mapper.Map<PaymentDto>(payment));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-        
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPayment(int id, PaymentDto paymentDto)
+        public async Task<IActionResult> PutPayment(int id, PaymentUpdateDto dto)
         {
-            if (id != paymentDto.PaymentId)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            bool result = await _paymentCrudService.UpdateEntityAsync(id, _mapper.Map<Payment>(paymentDto));
-
-            if (!result)
+            try
             {
-                return BadRequest();
+                if (dto.OrderId != null)
+                {
+                    var ocs = new OrdersCrudService(_paymentCrudService.Context);
+                    var order = await ocs.GetEntityByIdAsync(dto.OrderId);
+                    if (order == null)
+                        return NotFound($"Order with ID {dto.OrderId} not found");
+                }
+
+                var result = await _paymentCrudService.UpdateEntityAsync(id, dto);
+                if (!result)
+                    return BadRequest($"Failed to update Payment with ID {id}");
+
+                return NoContent();
             }
-            
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-        
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchPayment(int id, PaymentPatchDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                if (dto.OrderId != null)
+                {
+                    var ocs = new OrdersCrudService(_paymentCrudService.Context);
+                    var order = await ocs.GetEntityByIdAsync((int)dto.OrderId);
+                    if (order == null)
+                        return NotFound($"Order with ID {dto.OrderId} not found");
+                }
+
+                var result = await _paymentCrudService.PatchEntityAsync(id, dto);
+                if (!result)
+                    return BadRequest($"Failed to patch Payment with ID {id}");
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpPost]
-        public async Task<ActionResult<PaymentDto>> PostPayment(PaymentDto paymentDto)
+        public async Task<ActionResult<PaymentDto>> PostPayment(PaymentCreateDto dto)
         {
-            var createdPayment = _mapper.Map<Payment>(paymentDto);
-            bool result = await _paymentCrudService.CreateEntityAsync(createdPayment);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            if (!result)
+            try
             {
-                return BadRequest();
+                if (dto.OrderId != null)
+                {
+                    var ocs = new OrdersCrudService(_paymentCrudService.Context);
+                    var order = await ocs.GetEntityByIdAsync(dto.OrderId);
+                    if (order == null)
+                        return NotFound($"Order with ID {dto.OrderId} not found");
+                }
+
+                var created = _mapper.Map<Payment>(dto);
+                var result = await _paymentCrudService.CreateEntityAsync(created);
+                if (!result)
+                    return BadRequest("Failed to create Payment");
+
+                return CreatedAtAction(nameof(GetPayment), new { id = created.PaymentId },
+                    _mapper.Map<PaymentDto>(created));
             }
-            
-            return CreatedAtAction(nameof(GetPayment), new { id = createdPayment.PaymentId },
-                _mapper.Map<PaymentDto>(createdPayment));
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-        
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePayment(int id)
         {
-            bool result = await _paymentCrudService.DeleteEntityAsync(id);
-
-            if (!result)
+            try
             {
-                return NotFound();
+                var result = await _paymentCrudService.DeleteEntityAsync(id);
+                if (!result)
+                    return NotFound($"Payment with ID {id} not found");
+
+                return NoContent();
             }
-            
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

@@ -15,6 +15,8 @@ public partial class User
     public string PhoneNumber { get; set; } = null!;
     
     public UserRole Role { get; set; }
+    
+    public virtual ICollection<Order>? Orders { get; set; }
 
     public virtual ICollection<ComputerOnService> ComputersOnService { get; set; } = new List<ComputerOnService>();
 

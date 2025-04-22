@@ -3,7 +3,8 @@ using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
 using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using Microsoft.AspNetCore.Mvc;
 using ComputerAssemblyServiceBackEnd.Models;
-using ComputerAssemblyServiceBackEnd.Models.Dtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.EmployeePositionDtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.PatchDtos;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -23,82 +24,148 @@ namespace CompAssemblyServiceWebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeePositionDto>>> GetEmployeePositions()
         {
-            List<EmployeePosition> employeePosition = await _employeePositionCrudService.GetAllEntitiesAsync();
-            return Ok(_mapper.Map<IEnumerable<EmployeePositionDto>>(employeePosition));
+            try
+            {
+                var employeePosition = await _employeePositionCrudService.GetAllEntitiesAsync();
+                return Ok(_mapper.Map<IEnumerable<EmployeePositionDto>>(employeePosition));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EmployeePositionDto>> GetEmployeePosition(int id)
         {
-            var employeePosition = await _employeePositionCrudService.GetEntityByIdAsync(id);
-
-            if (employeePosition == null)
+            try
             {
-                return NotFound();
-            }
+                var employeePosition = await _employeePositionCrudService.GetEntityByIdAsync(id);
 
-            return Ok(_mapper.Map<EmployeePositionDto>(employeePosition));
+                if (employeePosition == null)
+                {
+                    return NotFound($"Position with ID {id} not found.");
+                }
+
+                return Ok(_mapper.Map<EmployeePositionDto>(employeePosition));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet("by-name/{name}")]
         public async Task<ActionResult<EmployeePositionDto>> GetEmployeePositionByName(string name)
         {
-            EmployeePositionsCrudService employeePositionsCrudService =
-                (_employeePositionCrudService as EmployeePositionsCrudService)!;
-            var employeePosition = await employeePositionsCrudService.GetEmployeePositionByNameAsync(name);
-
-            if (employeePosition == null)
+            try
             {
-                return NotFound();
-            }
+                var employeePositionsCrudService = (_employeePositionCrudService as EmployeePositionsCrudService)!;
+                var employeePosition = await employeePositionsCrudService.GetEmployeePositionByNameAsync(name);
 
-            return Ok(_mapper.Map<EmployeePositionDto>(employeePosition));
+                if (employeePosition == null)
+                {
+                    return NotFound($"Position with name '{name}' not found.");
+                }
+
+                return Ok(_mapper.Map<EmployeePositionDto>(employeePosition));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployeePosition(int id, EmployeePositionDto employeePositionDto)
+        public async Task<IActionResult> PutEmployeePosition(int id, EmployeePositionUpdateDto employeePositionUpdateDto)
         {
-            if (id != employeePositionDto.PositionId)
-            {
-                return BadRequest();
-            }
-
-            bool result = await _employeePositionCrudService.UpdateEntityAsync(id,
-                _mapper.Map<EmployeePosition>(employeePositionDto));
-
-            if (!result)
-            {
-                return NotFound();
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             
-            return NoContent();
+            try
+            {
+                bool result = await _employeePositionCrudService.UpdateEntityAsync(id, employeePositionUpdateDto);
+
+                if (!result)
+                {
+                    return NotFound($"Position with ID {id} not found.");
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchEmployeePosition(int id, EmployeePositionPatchDto employeePositionPatchDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            try
+            {
+                bool result = await _employeePositionCrudService.PatchEntityAsync(id, employeePositionPatchDto);
+
+                if (!result)
+                {
+                    return NotFound($"Position with ID {id} not found.");
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<EmployeePositionDto>> PostEmployeePosition(EmployeePositionDto employeePositionDto)
+        public async Task<ActionResult<EmployeePositionDto>> PostEmployeePosition(EmployeePositionCreateDto employeePositionCreateDto)
         {
-            var createdEmployeePosition = _mapper.Map<EmployeePosition>(employeePositionDto);
-            bool result = await _employeePositionCrudService.CreateEntityAsync(createdEmployeePosition);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             
-            if (!result)
+            try
             {
-                return BadRequest();
-            }
+                var createdEmployeePosition = _mapper.Map<EmployeePosition>(employeePositionCreateDto);
+                bool result = await _employeePositionCrudService.CreateEntityAsync(createdEmployeePosition);
 
-            return CreatedAtAction(nameof(GetEmployeePosition), new { id = createdEmployeePosition.PositionId },
-                _mapper.Map<EmployeeDto>(createdEmployeePosition));
+                if (!result)
+                {
+                    return BadRequest("Failed to create new employee position.");
+                }
+
+                return CreatedAtAction(nameof(GetEmployeePosition),
+                    new { id = createdEmployeePosition.PositionId },
+                    _mapper.Map<EmployeePositionDto>(createdEmployeePosition));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-        
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployeePosition(int id)
         {
-            bool result = await _employeePositionCrudService.DeleteEntityAsync(id);
-            if (!result)
+            try
             {
-                return NotFound();
+                bool result = await _employeePositionCrudService.DeleteEntityAsync(id);
+
+                if (!result)
+                {
+                    return NotFound($"Position with ID {id} not found.");
+                }
+
+                return NoContent();
             }
-            
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }
