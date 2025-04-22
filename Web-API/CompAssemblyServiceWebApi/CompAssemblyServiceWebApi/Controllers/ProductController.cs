@@ -28,8 +28,8 @@ namespace CompAssemblyServiceWebApi.Controllers
             return Ok(_mapper.Map<IEnumerable<ProductDto>>(products));
         }
 
-        [HttpGet("by-category")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory([FromQuery] ProductType category)
+        [HttpGet("by-category/{category}")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory([FromRoute] ProductType category)
         {
             ProductsCrudService productsCrudService = (_productCrudService as ProductsCrudService)!;
             List<Product> products = await productsCrudService.GetProductsByCategoryAsync(category);
@@ -70,16 +70,21 @@ namespace CompAssemblyServiceWebApi.Controllers
         [HttpPost]
         public async Task<ActionResult<ProductDto>> PostProduct(ProductDto productDto)
         {
-            var createdProduct = _mapper.Map<Product>(productDto);
-            bool result = await _productCrudService.CreateEntityAsync(createdProduct);
-
-            if (!result)
+            try
             {
-                return BadRequest();
-            }
+                var createdProduct = _mapper.Map<Product>(productDto);
+                bool result = await _productCrudService.CreateEntityAsync(createdProduct);
 
-            return CreatedAtAction(nameof(GetProduct), new { id = createdProduct.Sku },
-                _mapper.Map<ProductDto>(createdProduct));
+                if (!result)
+                    return BadRequest();
+
+                return CreatedAtAction(nameof(GetProduct), new { id = createdProduct.Sku },
+                    _mapper.Map<ProductDto>(createdProduct));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]

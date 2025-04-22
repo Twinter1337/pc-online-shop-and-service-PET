@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 using ComputerAssemblyServiceBackEnd.Enums.Models;
 using ComputerAssemblyServiceBackEnd.Mappings;
 using ComputerAssemblyServiceBackEnd.Models;
@@ -15,7 +16,21 @@ using Npgsql;
 var builder = WebApplication.CreateBuilder(args);
 
 // ===== Add services to container =====
-builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost5173", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMemoryCache();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -135,6 +150,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+app.UseCors("AllowLocalhost5173");
 
 // ===== Middleware Pipeline =====
 if (app.Environment.IsDevelopment())

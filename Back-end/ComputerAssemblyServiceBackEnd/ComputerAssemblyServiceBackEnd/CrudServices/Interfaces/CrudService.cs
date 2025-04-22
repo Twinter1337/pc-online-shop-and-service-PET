@@ -60,6 +60,33 @@ public abstract class CrudService<T> : ICrudService<T> where T : class
         return true;
     }
 
+    public async Task<bool> PatchEntityAsync<TPatchDto>(int id, TPatchDto patchDto)
+    {
+        var dbSet = Context.Set<T>();
+        var entity = await dbSet.FindAsync(id);
+        if (entity == null)
+            return false;
+
+        var dtoProperties = typeof(TPatchDto).GetProperties();
+        var entityProperties = typeof(T).GetProperties();
+
+        foreach (var dtoProp in dtoProperties)
+        {
+            var newValue = dtoProp.GetValue(patchDto);
+            if (newValue == null)
+                continue;
+
+            var entityProp = entityProperties.FirstOrDefault(p => p.Name == dtoProp.Name);
+            if (entityProp != null && entityProp.CanWrite)
+            {
+                entityProp.SetValue(entity, newValue);
+            }
+        }
+
+        await Context.SaveChangesAsync();
+        return true;
+    }
+    
     public virtual async Task<bool> DeleteEntityAsync(int id) 
     {
         var dbSet = Context.Set<T>();
