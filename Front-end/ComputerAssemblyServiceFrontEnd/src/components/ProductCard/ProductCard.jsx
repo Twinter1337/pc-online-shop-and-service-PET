@@ -23,13 +23,12 @@ export default function ProductCard({
   const characteristics = [
     { image: cpuImg, name: "CPU", model: processor },
     { image: gpuImg, name: "GPU", model: videoCard },
-    { image: ramImg, name: "Memory Type", model: memoryType },
     { image: ramImg, name: "RAM", model: ram },
     { image: hddImg, name: "HDD/SSD", model: storage },
   ];
 
   return (
-    <div className="product-card">
+    <article className="product-card">
       <img src={imageUrl} alt={title} className="product-image" />
 
       <h2 className="product-title">{title}</h2>
@@ -51,6 +50,6 @@ export default function ProductCard({
           <button>Purchase</button>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

@@ -58,7 +58,7 @@ public class MappingProfile : Profile
         CreateMap<Component, ComponentUpdateDto>()
             .AfterMap((src, dest) =>
             {
-                dest.Specs = src.Characteristics != null
+                dest.Characteristics = src.Characteristics != null
                     ? ConvertJsonObjectToDictionary(src.Characteristics)
                     : new Dictionary<string, object>();
             });
@@ -66,13 +66,13 @@ public class MappingProfile : Profile
         CreateMap<ComponentUpdateDto, Component>()
             .AfterMap((src, dest) =>
             {
-                dest.Characteristics = (JsonObject?)JsonNode.Parse(JsonSerializer.Serialize(src.Specs));
+                dest.Characteristics = (JsonObject?)JsonNode.Parse(JsonSerializer.Serialize(src.Characteristics));
             });
 
         CreateMap<Component, ComponentPatchDto>()
             .AfterMap((src, dest) =>
             {
-                dest.Specs = src.Characteristics != null
+                dest.Characteristics = src.Characteristics != null
                     ? ConvertJsonObjectToDictionary(src.Characteristics)
                     : new Dictionary<string, object>();
             });
@@ -80,7 +80,7 @@ public class MappingProfile : Profile
         CreateMap<ComponentPatchDto, Component>()
             .AfterMap((src, dest) =>
             {
-                dest.Characteristics = (JsonObject?)JsonNode.Parse(JsonSerializer.Serialize(src.Specs));
+                dest.Characteristics = (JsonObject?)JsonNode.Parse(JsonSerializer.Serialize(src.Characteristics));
             });
 
         #endregion
@@ -169,9 +169,7 @@ public class MappingProfile : Profile
         #region Product
 
         CreateMap<Product, ProductDto>().ReverseMap();
-        CreateMap<Product, ProductCreateDto>().ReverseMap()
-            .ForMember(dest => dest.ComputerId, opt => opt.Condition(src => src.ComputerId != null))
-            .ForMember(dest => dest.ComponentId, opt => opt.Condition(src => src.ComponentId != null));
+        CreateMap<Product, ProductCreateDto>().ReverseMap();
         CreateMap<Product, ProductUpdateDto>().ReverseMap();
         CreateMap<Product, ProductPatchDto>().ReverseMap();
 

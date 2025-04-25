@@ -2,10 +2,11 @@ using AutoMapper;
 using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
 using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using ComputerAssemblyServiceBackEnd.Enums.Models;
-using Microsoft.AspNetCore.Mvc;
 using ComputerAssemblyServiceBackEnd.Models;
 using ComputerAssemblyServiceBackEnd.Models.Dtos.PatchDtos;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.PrebuildPatternDtos;
 using ComputerAssemblyServiceBackEnd.Models.Dtos.ProductDtos;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -15,11 +16,13 @@ namespace CompAssemblyServiceWebApi.Controllers
     {
         private readonly ICrudService<Product> _productCrudService;
         private readonly IMapper _mapper;
+        private readonly PrebuildPatternsCrudService _ppcs;
 
         public ProductController(ICrudService<Product> productCrudService, IMapper mapper)
         {
             _productCrudService = productCrudService;
             _mapper = mapper;
+            _ppcs = new PrebuildPatternsCrudService(_productCrudService.Context);
         }
 
         [HttpGet]
@@ -28,7 +31,7 @@ namespace CompAssemblyServiceWebApi.Controllers
             try
             {
                 var products = await _productCrudService.GetAllEntitiesAsync();
-                return Ok(_mapper.Map<IEnumerable<ProductDto>>(products));
+                return Ok(BuildProductDtos(products));
             }
             catch (Exception ex)
             {
@@ -37,7 +40,7 @@ namespace CompAssemblyServiceWebApi.Controllers
         }
 
         [HttpGet("by-category/{category}")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory([FromRoute] ProductType category)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(ProductType category)
         {
             try
             {
@@ -45,7 +48,7 @@ namespace CompAssemblyServiceWebApi.Controllers
                     return StatusCode(500, "Cannot cast to ProductsCrudService");
 
                 var products = await productsService.GetProductsByCategoryAsync(category);
-                return Ok(_mapper.Map<IEnumerable<ProductDto>>(products));
+                return Ok(BuildProductDtos(products));
             }
             catch (Exception ex)
             {
@@ -62,11 +65,35 @@ namespace CompAssemblyServiceWebApi.Controllers
                 if (product == null)
                     return NotFound();
 
-                return Ok(_mapper.Map<ProductDto>(product));
+                var dto = BuildProductDtos(new List<Product> { product }).First();
+                return Ok(dto);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error retrieving product: {ex.Message}");
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ProductDto>> PostProduct([FromBody] ProductCreateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var entity = _mapper.Map<Product>(dto);
+                var success = await _productCrudService.CreateEntityAsync(entity);
+
+                if (!success)
+                    return BadRequest("Creation failed");
+
+                var resultDto = BuildProductDtos(new List<Product> { entity }).First();
+                return CreatedAtAction(nameof(GetProduct), new { id = entity.Sku }, resultDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error creating product: {ex.Message}");
             }
         }
 
@@ -78,15 +105,8 @@ namespace CompAssemblyServiceWebApi.Controllers
 
             try
             {
-                var validationResult = await ValidateProductIdsAsync(dto.ComponentId, dto.ComputerId);
-                if (validationResult != null)
-                    return validationResult;
-
-                if (_productCrudService is not ProductsCrudService pcs)
-                    return StatusCode(500, "Product service is not available");
-
-                bool result = await pcs.UpdateEntityAsync(id, dto);
-                return result ? NoContent() : BadRequest("Update failed due to invalid input or constraint violation.");
+                var result = await _productCrudService.UpdateEntityAsync(id, dto);
+                return result ? NoContent() : BadRequest("Update failed");
             }
             catch (Exception ex)
             {
@@ -102,38 +122,12 @@ namespace CompAssemblyServiceWebApi.Controllers
 
             try
             {
-                bool result = await _productCrudService.PatchEntityAsync(id, dto);
+                var result = await _productCrudService.PatchEntityAsync(id, dto);
                 return result ? NoContent() : BadRequest("Patch failed");
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error patching product: {ex.Message}");
-            }
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<ProductDto>> PostProduct(ProductCreateDto dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                var validationResult = await ValidateProductIdsAsync(dto.ComponentId, dto.ComputerId);
-                if (validationResult != null)
-                    return validationResult;
-
-                var entity = _mapper.Map<Product>(dto);
-                bool result = await _productCrudService.CreateEntityAsync(entity);
-
-                if (!result)
-                    return BadRequest("Creation failed");
-
-                return CreatedAtAction(nameof(GetProduct), new { id = entity.Sku }, _mapper.Map<ProductDto>(entity));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error creating product: {ex.Message}");
             }
         }
 
@@ -151,28 +145,15 @@ namespace CompAssemblyServiceWebApi.Controllers
             }
         }
 
-        private async Task<ActionResult> ValidateProductIdsAsync(int? componentId, int? computerId)
+        private List<ProductDto> BuildProductDtos(IEnumerable<Product> products)
         {
-            if (componentId != null && computerId != null)
-                return BadRequest("Product can have either ComponentId or ComputerId, not both");
-
-            if (componentId != null)
+            var productDtos = _mapper.Map<List<ProductDto>>(products.ToList());
+            foreach (var (product, dto) in products.Zip(productDtos, (p, d) => (p, d)))
             {
-                var componentService = new ComponentsCrudService(_productCrudService.Context);
-                var component = await componentService.GetEntityByIdAsync(componentId.Value);
-                if (component == null)
-                    return NotFound($"Component with ID {componentId} not found");
+                dto.PrebuildPattern = _mapper.Map<PrebuildPatternDto>(product.Computer);
+                dto.PrebuildPattern.Components = _ppcs.GetComponentsForPattern(product.Computer, _mapper);
             }
-
-            if (computerId != null)
-            {
-                var computerService = new PrebuildPatternsCrudService(_productCrudService.Context);
-                var computer = await computerService.GetEntityByIdAsync(computerId.Value);
-                if (computer == null)
-                    return NotFound($"Computer with ID {computerId} not found");
-            }
-
-            return null;
+            return productDtos;
         }
     }
 }

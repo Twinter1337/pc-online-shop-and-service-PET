@@ -5,7 +5,7 @@ export const ComponentType = {
   SSD: "SSD",
   HDD: "HDD",
   PSU: "PSU",
-  MOTHERBOARD: "Motherboard",
-  CASE: "Case",
-  COOLINGSYSTEM: "CoolingSystem",
+  Motherboard: "Motherboard",
+  Case: "Case",
+  CoolingSystem: "CoolingSystem",
 };

@@ -1,5 +1,5 @@
 export const PaymentMethod = {
-  CARD: "Card",
-  CASH: "Cash",
-  CRYPTO: "Crypto",
+  Card: "Card",
+  Cash: "Cash",
+  Crypto: "Crypto",
 };

@@ -1,9 +1,9 @@
 export const OrderStatus = {
-  NEW: "New",
-  CONFIRMED: "Confirmed",
-  PROCESSING: "Processing",
-  PAID: "Paid",
-  PENDING: "Pending",
-  RETURNED: "Returned",
-  COMPLETE: "Complete",
+  New: "New",
+  Confirmed: "Confirmed",
+  Processing: "Processing",
+  Paid: "Paid",
+  Pending: "Pending",
+  Returned: "Returned",
+  Complete: "Complete",
 };

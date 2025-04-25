@@ -9,5 +9,5 @@ public class ComponentPatchDto
     public int? QuantityOnStock { get; set; }
     public decimal? Price { get; set; }
     public ComponentType? Category { get; set; }
-    public Dictionary<string, object>? Specs { get; set; }
+    public Dictionary<string, object>? Characteristics { get; set; }
 }

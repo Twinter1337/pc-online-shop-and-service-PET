@@ -13,160 +13,136 @@ namespace ComputerAssemblyServiceWebApi.Controllers
     [ApiController]
     public class ComponentsController : ControllerBase
     {
-        private readonly ICrudService<Component> _componentsCrudService;
+        private readonly ICrudService<Component> _crud;
         private readonly IMapper _mapper;
 
-        public ComponentsController(ICrudService<Component> componentsCrudService, IMapper mapper)
+        public ComponentsController(ICrudService<Component> crud, IMapper mapper)
         {
-            _componentsCrudService = componentsCrudService;
+            _crud = crud;
             _mapper = mapper;
         }
-        
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ComponentDto>>> GetComponents()
         {
             try
             {
-                List<Component> components = await _componentsCrudService.GetAllEntitiesAsync();
-                if (components == null || !components.Any())
-                {
-                    return NotFound("No components found.");
-                }
-                return Ok(_mapper.Map<IEnumerable<ComponentDto>>(components));
+                var components = await _crud.GetAllEntitiesAsync();
+                return components?.Any() == true
+                    ? Ok(_mapper.Map<IEnumerable<ComponentDto>>(components))
+                    : NotFound("No components found.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Error retrieving components: {ex.Message}");
             }
         }
-        
+
         [HttpGet("filter")]
         public async Task<ActionResult<IEnumerable<ComponentDto>>> GetFilteredComponents([FromQuery] ComponentFilter filter)
         {
             try
             {
-                ComponentsCrudService componentsCrudService = (_componentsCrudService as ComponentsCrudService)!;
-                List<Component> components = await componentsCrudService.GetFilteredComponentsAsync(filter);
-                if (components == null || !components.Any())
-                {
-                    return NotFound("No components match the filter criteria.");
-                }
-                return Ok(_mapper.Map<IEnumerable<ComponentDto>>(components));
+                if (_crud is not ComponentsCrudService service)
+                    return StatusCode(500, "Service not available.");
+
+                var components = await service.GetFilteredComponentsAsync(filter);
+                return components?.Any() == true
+                    ? Ok(_mapper.Map<IEnumerable<ComponentDto>>(components))
+                    : NotFound("No components match the filter criteria.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Error filtering components: {ex.Message}");
             }
         }
-        
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ComponentDto>> GetComponent(int id)
         {
             try
             {
-                var component = await _componentsCrudService.GetEntityByIdAsync(id);
-
-                if (component == null)
-                {
-                    return NotFound($"Component with ID {id} not found.");
-                }
-
-                return Ok(_mapper.Map<ComponentDto>(component));
+                var component = await _crud.GetEntityByIdAsync(id);
+                return component != null
+                    ? Ok(_mapper.Map<ComponentDto>(component))
+                    : NotFound($"Component with ID {id} not found.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Error retrieving component: {ex.Message}");
             }
         }
-        
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutComponent(int id, ComponentUpdateDto componentUpdateDto)
+        public async Task<IActionResult> PutComponent(int id, ComponentUpdateDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
+
             try
             {
-                bool result = await _componentsCrudService.UpdateEntityAsync(id, componentUpdateDto);
+                if (_crud is not ComponentsCrudService service)
+                    return StatusCode(500, "Service not available.");
 
-                if (!result)
-                {
-                    return NotFound($"Component with ID {id} not found.");
-                }
-
-                return NoContent();
+                return await service.UpdateEntityAsync(id, dto)
+                    ? NoContent()
+                    : NotFound($"Component with ID {id} not found.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Error updating component: {ex.Message}");
             }
         }
-        
+
         [HttpPatch("{id}")]
-        public async Task<IActionResult> PatchComponent(int id, [FromBody] ComponentPatchDto componentPatchDto)
+        public async Task<IActionResult> PatchComponent(int id, ComponentPatchDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
+
             try
             {
-                bool result = await _componentsCrudService.PatchEntityAsync(id, componentPatchDto);
-
-                if (!result)
-                {
-                    return NotFound($"Component with ID {id} not found.");
-                }
-
-                return NoContent();
+                return await _crud.PatchEntityAsync(id, dto)
+                    ? NoContent()
+                    : NotFound($"Component with ID {id} not found.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Error patching component: {ex.Message}");
             }
         }
 
         [HttpPost]
-        public async Task<ActionResult<ComponentDto>> PostComponent(ComponentCreateDto componentCreateDto)
+        public async Task<ActionResult<ComponentDto>> PostComponent(ComponentCreateDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
+
             try
             {
-                var createdComponent = _mapper.Map<Component>(componentCreateDto);
-                bool result = await _componentsCrudService.CreateEntityAsync(createdComponent);
-
-                if (!result)
-                {
-                    return BadRequest("Error creating the component.");
-                }
-
-                return CreatedAtAction(nameof(GetComponent), new { id = createdComponent.ComponentId },
-                    _mapper.Map<ComponentDto>(createdComponent));
+                var component = _mapper.Map<Component>(dto);
+                return await _crud.CreateEntityAsync(component)
+                    ? CreatedAtAction(nameof(GetComponent), new { id = component.ComponentId }, _mapper.Map<ComponentDto>(component))
+                    : BadRequest("Failed to create component.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Error creating component: {ex.Message}");
             }
         }
-        
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteComponent(int id)
         {
             try
             {
-                bool result = await _componentsCrudService.DeleteEntityAsync(id);
-
-                if (!result)
-                {
-                    return NotFound($"Component with ID {id} not found.");
-                }
-
-                return NoContent();
+                return await _crud.DeleteEntityAsync(id)
+                    ? NoContent()
+                    : NotFound($"Component with ID {id} not found.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Error deleting component: {ex.Message}");
             }
         }
     }

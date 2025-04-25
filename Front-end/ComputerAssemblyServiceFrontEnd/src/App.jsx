@@ -8,6 +8,7 @@ import StorePage from "./pages/store-page/StorePage";
 import ServicePage from "./pages/service-page/ServicePage";
 import UserPage from "./pages/user-page/UserPage";
 import ContactPage from "./pages/contact-page/ContactPage";
+import CartPage from "./pages/cart-page/CartPage";
 
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
@@ -25,6 +26,7 @@ export default function App() {
               <Route path="/service-page" element={<ServicePage />} />
               <Route path="/user-page" element={<UserPage />} />
               <Route path="/contact-page" element={<ContactPage />} />
+              <Route path="/cart-page" element={<CartPage />} />
             </Routes>
           </main>
           <Footer />

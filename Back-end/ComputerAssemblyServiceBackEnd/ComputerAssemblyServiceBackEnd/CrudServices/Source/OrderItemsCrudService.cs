@@ -33,7 +33,6 @@ public class OrderItemsCrudService: CrudService<OrderItem>
         
         return await query.Include(oi => oi.Order)
             .Include(oi => oi.Product)
-            .ThenInclude(p => p.Component)
             .Include(oi => oi.Product)
             .ThenInclude(p => p.Computer)
             .ToListAsync();

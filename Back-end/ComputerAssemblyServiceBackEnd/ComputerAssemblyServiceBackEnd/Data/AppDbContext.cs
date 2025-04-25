@@ -91,7 +91,7 @@ public partial class AppDbContext : DbContext
                 new[] { "New", "Confirmed", "Processing", "Paid", "Pending", "Returned", "Complete" })
             .HasPostgresEnum("payment_method", new[] { "Card", "Cash", "Crypto" })
             .HasPostgresEnum("payment_status", new[] { "Pending", "Processing", "Complited", "Failed", "Canceled" })
-            .HasPostgresEnum("product_type", new[] { "Computer", "Component" })
+            .HasPostgresEnum("product_type", new[] { "Computer", "Gamin PC", "Work station" })
             .HasPostgresEnum("service_status", new[] { "New", "In progress", "Done", "Closed", "Cancelled", "Faild" })
             .HasPostgresEnum("user_role", new[] { "Client", "Manager", "Service Worker" });
 
@@ -414,9 +414,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Sku)
                 .HasColumnName("sku");
 
-            entity.Property(e => e.ComponentId)
-                .HasColumnName("component_id");
-
             entity.Property(e => e.ComputerId)
                 .HasColumnName("computer_id");
 
@@ -428,18 +425,9 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("img_url")
                 .HasMaxLength(2048);
 
-            entity.HasIndex(e => e.ComponentId, "products_component_id_key")
-                .IsUnique();
-
             entity.HasIndex(e => e.ComputerId, "products_computer_id_key")
                 .IsUnique();
-
-            entity.HasOne(d => d.Component)
-                .WithOne(p => p.Products)
-                .HasForeignKey<Product>(d => d.ComponentId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("products_component_id_fkey");
-
+            
             entity.HasOne(d => d.Computer)
                 .WithOne(p => p.Product)
                 .HasForeignKey<Product>(d => d.ComputerId)

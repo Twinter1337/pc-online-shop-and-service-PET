@@ -1,4 +1,4 @@
 export const ProductType = {
-  COMPUTER: "Computer",
-  COMPONENT: "Component",
+  Computer: "Computer",
+  Component: "Component",
 };

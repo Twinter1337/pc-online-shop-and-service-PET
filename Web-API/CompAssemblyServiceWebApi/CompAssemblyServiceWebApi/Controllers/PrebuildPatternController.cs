@@ -4,6 +4,7 @@ using ComputerAssemblyServiceBackEnd.CrudServices.Source;
 using ComputerAssemblyServiceBackEnd.Filters.Models;
 using Microsoft.AspNetCore.Mvc;
 using ComputerAssemblyServiceBackEnd.Models;
+using ComputerAssemblyServiceBackEnd.Models.Dtos.ComponentDtos;
 using ComputerAssemblyServiceBackEnd.Models.Dtos.PatchDtos;
 using ComputerAssemblyServiceBackEnd.Models.Dtos.PrebuildPatternDtos;
 
@@ -13,22 +14,24 @@ namespace CompAssemblyServiceWebApi.Controllers
     [ApiController]
     public class PrebuildPatternController : ControllerBase
     {
-        private readonly ICrudService<PrebuildPattern> _prebuildPatternCrudService;
+        private readonly ICrudService<PrebuildPattern> _service;
         private readonly IMapper _mapper;
+        private readonly PrebuildPatternsCrudService _ppcs;
 
-        public PrebuildPatternController(ICrudService<PrebuildPattern> prebuildPatternCrudService, IMapper mapper)
+        public PrebuildPatternController(ICrudService<PrebuildPattern> service, IMapper mapper)
         {
-            _prebuildPatternCrudService = prebuildPatternCrudService;
+            _service = service;
             _mapper = mapper;
+            _ppcs = service as PrebuildPatternsCrudService ?? throw new InvalidCastException("Service must be PrebuildPatternsCrudService");
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PrebuildPatternDto>>> GetPrebuildPatterns()
+        public async Task<ActionResult<IEnumerable<PrebuildPatternDto>>> GetAll()
         {
             try
             {
-                var patterns = await _prebuildPatternCrudService.GetAllEntitiesAsync();
-                return Ok(_mapper.Map<IEnumerable<PrebuildPatternDto>>(patterns));
+                var patterns = await _service.GetAllEntitiesAsync();
+                return Ok(BuildDtos(patterns));
             }
             catch (Exception ex)
             {
@@ -37,15 +40,12 @@ namespace CompAssemblyServiceWebApi.Controllers
         }
 
         [HttpGet("filter")]
-        public async Task<ActionResult<IEnumerable<PrebuildPatternDto>>> GetFilteredPrebuildPatterns([FromQuery] PrebuildPatternFilter filter)
+        public async Task<ActionResult<IEnumerable<PrebuildPatternDto>>> GetFiltered([FromQuery] PrebuildPatternFilter filter)
         {
             try
             {
-                if (_prebuildPatternCrudService is not PrebuildPatternsCrudService patternsService)
-                    return StatusCode(500, "Cannot cast to PrebuildPatternsCrudService");
-
-                var filtered = await patternsService.GetFilteredPrebuildPatternsAsync(filter);
-                return Ok(_mapper.Map<IEnumerable<PrebuildPatternDto>>(filtered));
+                var filtered = await _ppcs.GetFilteredPrebuildPatternsAsync(filter);
+                return Ok(BuildDtos(filtered));
             }
             catch (Exception ex)
             {
@@ -54,15 +54,14 @@ namespace CompAssemblyServiceWebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PrebuildPatternDto>> GetPrebuildPattern(int id)
+        public async Task<ActionResult<PrebuildPatternDto>> GetById(int id)
         {
             try
             {
-                var pattern = await _prebuildPatternCrudService.GetEntityByIdAsync(id);
-                if (pattern == null)
-                    return NotFound($"Pattern with ID {id} not found");
+                var pattern = await _service.GetEntityByIdAsync(id);
+                if (pattern == null) return NotFound($"Pattern with ID {id} not found");
 
-                return Ok(_mapper.Map<PrebuildPatternDto>(pattern));
+                return Ok(BuildDtos(new[] { pattern }).First());
             }
             catch (Exception ex)
             {
@@ -70,19 +69,35 @@ namespace CompAssemblyServiceWebApi.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPrebuildPattern(int id, PrebuildPatternUpdateDto dto)
+        [HttpPost]
+        public async Task<ActionResult<PrebuildPatternDto>> Create(PrebuildPatternCreateDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             try
             {
-                var result = await _prebuildPatternCrudService.UpdateEntityAsync(id, dto);
-                if (!result)
-                    return BadRequest($"Failed to update pattern with ID {id}");
+                var entity = _mapper.Map<PrebuildPattern>(dto);
+                if (!await _service.CreateEntityAsync(entity))
+                    return BadRequest("Failed to create pattern");
 
-                return NoContent();
+                return CreatedAtAction(nameof(GetById), new { id = entity.SerialNumber }, _mapper.Map<PrebuildPatternDto>(entity));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error creating pattern: {ex.Message}");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, PrebuildPatternUpdateDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                return await _service.UpdateEntityAsync(id, dto)
+                    ? NoContent()
+                    : BadRequest($"Failed to update pattern with ID {id}");
             }
             catch (Exception ex)
             {
@@ -91,18 +106,15 @@ namespace CompAssemblyServiceWebApi.Controllers
         }
 
         [HttpPatch("{id}")]
-        public async Task<IActionResult> PatchPrebuildPattern(int id, PrebuildPatternPatchDto dto)
+        public async Task<IActionResult> Patch(int id, PrebuildPatternPatchDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             try
             {
-                var result = await _prebuildPatternCrudService.PatchEntityAsync(id, dto);
-                if (!result)
-                    return BadRequest($"Failed to patch pattern with ID {id}");
-
-                return NoContent();
+                return await _service.PatchEntityAsync(id, dto)
+                    ? NoContent()
+                    : BadRequest($"Failed to patch pattern with ID {id}");
             }
             catch (Exception ex)
             {
@@ -110,43 +122,29 @@ namespace CompAssemblyServiceWebApi.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<ActionResult<PrebuildPatternDto>> PostPrebuildPattern(PrebuildPatternCreateDto dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                var entity = _mapper.Map<PrebuildPattern>(dto);
-                var result = await _prebuildPatternCrudService.CreateEntityAsync(entity);
-                if (!result)
-                    return BadRequest("Failed to create pattern");
-
-                return CreatedAtAction(nameof(GetPrebuildPattern), new { id = entity.SerialNumber },
-                    _mapper.Map<PrebuildPatternDto>(entity));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error creating pattern: {ex.Message}");
-            }
-        }
-
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePrebuildPattern(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var result = await _prebuildPatternCrudService.DeleteEntityAsync(id);
-                if (!result)
-                    return NotFound($"Pattern with ID {id} not found");
-
-                return NoContent();
+                return await _service.DeleteEntityAsync(id)
+                    ? NoContent()
+                    : NotFound($"Pattern with ID {id} not found");
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error deleting pattern: {ex.Message}");
             }
+        }
+
+        private List<PrebuildPatternDto> BuildDtos(IEnumerable<PrebuildPattern> patterns)
+        {
+            var dtos = _mapper.Map<List<PrebuildPatternDto>>(patterns);
+            foreach (var (pattern, dto) in patterns.Zip(dtos))
+            {
+                dto.Components = _ppcs.GetComponentsForPattern(pattern, _mapper);
+            }
+            return dtos;
         }
     }
 }

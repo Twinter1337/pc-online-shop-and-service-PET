@@ -1,8 +1,8 @@
 export const ServiceStatus = {
-  NEW: "New",
-  IN_PROGRESS: "InProgress",
-  DONE: "Done",
-  CLOSED: "Closed",
-  CANCELLED: "Cancelled",
-  FAILD: "Faild",
+  New: "New",
+  InProgress: "InProgress",
+  Done: "Done",
+  Closed: "Closed",
+  Cancelled: "Cancelled",
+  Faild: "Faild",
 };

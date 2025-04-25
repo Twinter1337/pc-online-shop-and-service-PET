@@ -91,7 +91,7 @@ public abstract class CrudService<T> : ICrudService<T> where T : class
         await Context.SaveChangesAsync();
         return true;
     }
-    public async Task<bool> PatchEntityAsync<TPatchDto>(int id, TPatchDto patchDto)
+    public virtual async Task<bool> PatchEntityAsync<TPatchDto>(int id, TPatchDto patchDto)
     {
         var dbSet = Context.Set<T>();
         var entity = await dbSet.FindAsync(id);

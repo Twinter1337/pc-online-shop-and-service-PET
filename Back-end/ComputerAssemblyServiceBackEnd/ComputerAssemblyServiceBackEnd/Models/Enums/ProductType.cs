@@ -6,6 +6,8 @@ public enum ProductType
 {
     [PgName("Computer")]
     Computer,
-    [PgName("Component")]
-    Component
+    [PgName("Gaming PC")]
+    GamingPC,
+    [PgName("Work station")]
+    WorkStation,
 }

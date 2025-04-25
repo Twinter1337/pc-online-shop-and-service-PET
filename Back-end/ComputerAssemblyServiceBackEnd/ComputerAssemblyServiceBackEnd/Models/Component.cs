@@ -20,6 +20,4 @@ public partial class Component
     public JsonObject? Characteristics { get; set; }
 
     public virtual ICollection<PatternComponent> PatternComponents { get; set; } = new List<PatternComponent>();
-
-    public virtual Product? Products { get; set; }
 }
