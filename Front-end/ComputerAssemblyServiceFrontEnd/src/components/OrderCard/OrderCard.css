@@ -1,0 +1,38 @@
+.order-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 15px;
+  background-color: #2e2e2e;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  font-size: 1.5rem;
+  width: 100%;
+  gap: 15px;
+  height: fit-content;
+}
+
+.order-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px
+}
+
+.order-items,
+.order-services {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.add-order-info {
+  align-self: self-start;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.pay-button {
+  width: 100%;
+}

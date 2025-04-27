@@ -1,0 +1,11 @@
+.service-page {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.service-page-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

@@ -8,8 +8,11 @@ import contactUsPng from "../../assets/ContactUsPng/contact-us-16.png";
 import cartPng from "../../assets/CartPng/cart-24.png";
 
 import { Link } from "react-router-dom";
+import { useUser } from "../../contextes/UserContext";
 
 export default function Header() {
+  const { user, isAuthorized, logout } = useUser();
+
   return (
     <header>
       <div class="nav-continer">
@@ -26,10 +29,19 @@ export default function Header() {
           Contact us
         </Link>
         <div className="vertical-line"></div>
-        <Link to="/user-page" className="user-account link">
-          <img class="user-img" src={userPng} alt="User img logo" />
-          Sign in
-        </Link>
+        {isAuthorized ? (
+          <>
+            <Link to="/user-page" className="user-account link">
+              <img class="user-img" src={userPng} alt="User img logo" />
+              {user?.firstName}
+            </Link>
+          </>
+        ) : (
+          <Link to="/auth-page" className="user-account link">
+            <img class="user-img" src={userPng} alt="User img logo" />
+            Sign in
+          </Link>
+        )}
       </div>
     </header>
   );

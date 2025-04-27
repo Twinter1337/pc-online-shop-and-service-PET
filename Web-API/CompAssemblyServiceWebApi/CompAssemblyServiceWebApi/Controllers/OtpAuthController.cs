@@ -1,9 +1,11 @@
 using ComputerAssemblyServiceBackEnd.Models.Dtos.OtpDtos;
 using Microsoft.AspNetCore.Mvc;
 using ComputerAssemblyServiceBackEnd.OtpService;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CompAssemblyServiceWebApi.Controllers;
 
+[AllowAnonymous]
 [ApiController]
 [Route("auth")]
 public class AuthController : ControllerBase

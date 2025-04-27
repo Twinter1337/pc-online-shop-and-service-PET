@@ -16,21 +16,16 @@ public class OrderItemsCrudService: CrudService<OrderItem>
     {
         var query = Context.OrderItems.AsQueryable();
 
-        if (filter.MaxPrice.HasValue)
-        {
-            query = query.Where(x => x.Price <= filter.MaxPrice.Value);
-        }
-
-        if (filter.MinPrice.HasValue)
-        {
-            query = query.Where(x => x.Price >= filter.MinPrice.Value);
-        }
-
         if (filter.OrderId.HasValue)
         {
             query = query.Where(x => x.OrderId == filter.OrderId);
         }
-        
+
+
+        if (filter.ProductId.HasValue)
+        {
+            query = query.Where(x => x.ProductId == filter.ProductId);
+        }
         return await query.Include(oi => oi.Order)
             .Include(oi => oi.Product)
             .Include(oi => oi.Product)

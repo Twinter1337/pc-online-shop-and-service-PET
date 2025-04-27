@@ -35,6 +35,21 @@ namespace CompAssemblyServiceWebApi.Controllers
             }
         }
 
+        [HttpGet("by-order-id/{orderId}")]
+        public async Task<ActionResult<IEnumerable<OrderServiceDto>>> GetOrderServicesByOrderId(int orderId)
+        {
+            try
+            {
+                var oscs = _orderServiceCrudService as OrderServicesCrudService;
+                List<OrderService> services = await oscs.GetOrderServicesByOrderIdAsync(orderId);
+                return Ok(_mapper.Map<IEnumerable<OrderServiceDto>>(services));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderServiceDto>> GetOrderService(int id)
         {

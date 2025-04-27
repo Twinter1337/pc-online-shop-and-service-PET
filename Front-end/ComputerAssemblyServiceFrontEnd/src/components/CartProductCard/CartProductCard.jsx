@@ -1,6 +1,51 @@
+import { useState } from "react";
 import "./CartProductCard.css";
+import {
+  updateOrderItemQuantity,
+  deleteOrderItem,
+} from "../../scripts/services/order-service";
 
-export default function CartProductCard({ imgUrl, title, price, quantity }) {
+export default function CartProductCard({
+  imgUrl,
+  title,
+  price,
+  quantity: initialQuantity,
+  itemId,
+  onRemove,
+}) {
+  const [quantity, setQuantity] = useState(initialQuantity);
+
+  const handleIncrease = async () => {
+    const newQuantity = quantity + 1;
+    setQuantity(newQuantity);
+
+    try {
+      await updateOrderItemQuantity(itemId, newQuantity);
+    } catch (error) {
+      console.error("Failed to update quantity:", error);
+    }
+  };
+
+  const handleDecrease = async () => {
+    const newQuantity = quantity - 1;
+
+    if (newQuantity > 0) {
+      setQuantity(newQuantity);
+
+      try {
+        await updateOrderItemQuantity(itemId, newQuantity);
+      } catch (error) {
+        console.error("Failed to update quantity:", error);
+      }
+    } else {
+      try {
+        await deleteOrderItem(itemId);
+      } catch (error) {
+        console.error("Failed to delete item:", error);
+      }
+    }
+  };
+
   return (
     <article className="cart-product-card">
       <div className="product-info">
@@ -8,10 +53,20 @@ export default function CartProductCard({ imgUrl, title, price, quantity }) {
         <p className="product-in-cart-title">{title}</p>
       </div>
       <div className="product-price-and-controls">
-        <p className="product-in-cart-price">{price * quantity} UAH</p>
-        <button className="button plus-product-quantity">+</button>
+        <p className="product-in-cart-price">{price} UAH</p>
+        <button
+          className="button minus-product-quantity"
+          onClick={handleDecrease}
+        >
+          -
+        </button>
         <p className="product-in-cart-quantity">{quantity}</p>
-        <button className="button minus-product-quantity">-</button>
+        <button
+          className="button plus-product-quantity"
+          onClick={handleIncrease}
+        >
+          +
+        </button>
       </div>
     </article>
   );

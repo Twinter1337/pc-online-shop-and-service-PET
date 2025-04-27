@@ -240,10 +240,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.ProductId)
                 .HasColumnName("product_id");
 
-            entity.Property(e => e.Price)
-                .HasColumnName("price")
-                .HasPrecision(10, 2);
-
             entity.Property(e => e.Quantity)
                 .HasColumnName("quantity")
                 .HasDefaultValue(1);

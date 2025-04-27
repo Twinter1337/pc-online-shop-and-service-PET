@@ -43,6 +43,10 @@ namespace CompAssemblyServiceWebApi.Controllers
             {
                 var ordersCrudService = (_orderCrudService as OrdersCrudService)!;
                 var orders = await ordersCrudService.GetFilteredOrdersAsync(filter);
+                if (orders.Count == 0)
+                {
+                    return NotFound("No orders found"); 
+                }
                 return Ok(_mapper.Map<IEnumerable<OrderDto>>(orders));
             }
             catch (Exception ex)

@@ -1,17 +1,8 @@
-:root {
-  --product-card-background-color: #272727;
-  --font-color: #cecece;
-  --transition-time: 0.5s;
-  --gray-color: #444;
-  --product-specs-font-color: #ccc;
-  --button-background-color: #1d1d1d;
-}
-
 .cart-product-card {
   display: flex;
   height: 6.2rem;
   border-radius: 15px;
-  background-color: var(--product-card-background-color);
+  background-color: #313131;
   align-items: center;
   justify-content: space-between;
   padding: 10px;

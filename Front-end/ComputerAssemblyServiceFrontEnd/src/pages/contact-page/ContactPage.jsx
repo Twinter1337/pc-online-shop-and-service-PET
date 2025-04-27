@@ -11,10 +11,10 @@ export default function ContactPage() {
       <div className="line-br"></div>
 
       <div className="contacts">
-        <p>
+        <div>
           <p className="title">Service center/Shop</p>
           <strong>Address:</strong> Lukasha 4V, Lviv, Ukraine
-        </p>
+        </div>
         <p>
           Mon.-Fri. from 09:00 to 19:00 <br />
           Sat. from 10:00 to 18:00

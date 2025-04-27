@@ -1,4 +1,4 @@
-//Styles
+import { useEffect, useState } from "react";
 import "./ProductCard.css";
 
 //Image imports
@@ -9,17 +9,45 @@ import hddImg from "../../assets/ProductCardSvgs/hdd-part.svg";
 
 //Component imports
 import ProductCharacteristic from "./ProductCharacteristic/ProductCharacteristic";
+import { addOrderItem } from "../../scripts/services/order-service";
+import { useUser } from "../../contextes/UserContext";
+import { useNavigate } from "react-router-dom";
 
 export default function ProductCard({
   title,
   imageUrl,
   processor,
   videoCard,
-  memoryType,
   ram,
   storage,
   price,
+  productId,
 }) {
+  const { user, isAuthorized } = useUser();
+  const navigate = useNavigate();
+  const [isAdded, setIsAdded] = useState(false); // <--- додали стан
+
+  const handleAddToCart = async (productId, price) => {
+    if (!isAuthorized) {
+      localStorage.setItem(
+        "pendingCartItem",
+        JSON.stringify({ productId, price })
+      );
+
+      navigate("/auth-page");
+      return;
+    }
+
+    await addOrderItem(user, isAuthorized, productId, price);
+
+    // Після додавання в корзину
+    setIsAdded(true);
+
+    setTimeout(() => {
+      setIsAdded(false);
+    }, 2000); // 5 секунд
+  };
+
   const characteristics = [
     { image: cpuImg, name: "CPU", model: processor },
     { image: gpuImg, name: "GPU", model: videoCard },
@@ -47,7 +75,12 @@ export default function ProductCard({
       <div className="product-footer">
         <div className="product-price">{price} UAH</div>
         <div className="product-actions">
-          <button>Purchase</button>
+          <button
+            className={isAdded ? "added" : ""}
+            onClick={async () => await handleAddToCart(productId, price)}
+          >
+            {isAdded ? "Purchased!" : "Purchase"}
+          </button>
         </div>
       </div>
     </article>

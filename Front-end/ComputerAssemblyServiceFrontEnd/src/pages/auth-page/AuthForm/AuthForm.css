@@ -1,0 +1,103 @@
+.auth-form-wrapper {
+  background-color: #262626;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 400px;
+
+  margin: 0 auto;
+  transform-origin: center;
+}
+
+.auth-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #cecece;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #cecece;
+  font-size: 14px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cecece;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+  background-color: #444;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #eacf00;
+  background-color: #444;
+}
+
+.error-message {
+  color: #eacf00;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.button {
+  background-color: #1d1d1d;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 8px;
+}
+
+.button:hover {
+  background-color: #444;
+}
+
+.email-notice {
+  color: #666;
+  margin-bottom: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Анімації (можна додати до вашого глобального CSS) */
+.fade-enter {
+  opacity: 0;
+  transform: translateX(50px);
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 300ms ease-in;
+}
+
+.fade-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: all 300ms ease-in;
+}

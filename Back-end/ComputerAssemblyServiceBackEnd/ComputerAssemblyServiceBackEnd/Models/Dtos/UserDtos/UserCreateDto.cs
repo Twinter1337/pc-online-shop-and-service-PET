@@ -11,8 +11,7 @@ public class UserCreateDto
     public string LastName { get; set; } = null!;
     [Required]
     public string Email { get; set; } = null!;
-    [Required]
-    public string PhoneNumber { get; set; } = null!;
+    public string? PhoneNumber { get; set; }
     [Required]
     public UserRole Role { get; set; }
 }

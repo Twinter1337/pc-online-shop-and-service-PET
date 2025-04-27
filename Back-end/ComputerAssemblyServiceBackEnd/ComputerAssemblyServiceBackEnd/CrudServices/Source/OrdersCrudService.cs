@@ -21,7 +21,7 @@ public class OrdersCrudService: CrudService<Order>
             query = query.Where(o => o.Status == filter.Status);
         }
 
-        if (filter.ClientId.HasValue)
+        if (filter.ClientId.HasValue || filter.ClientId == null)
         {
             query = query.Where(o => o.ClientId == filter.ClientId);
         }

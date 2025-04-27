@@ -1,5 +1,6 @@
 .cart-page {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 2fr;
+  gap: 15px
 }
 
 .cart-page-container {
@@ -9,7 +10,26 @@
 .cart-items {
   display: flex;
   flex-direction: column;
+  padding: 15px;
+  width: 100%;
   gap: 1rem;
+  background-color: #181818;
+  height: 43.8rem;
+  overflow-y: auto;
+  border-radius: 15px;
   grid-column: 2/3;
   padding-top: 12px;
+}
+
+.empty-cart-p {
+
+  align-self: center;
+}
+
+.payment-section {
+  grid-row: 2/3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
 }
