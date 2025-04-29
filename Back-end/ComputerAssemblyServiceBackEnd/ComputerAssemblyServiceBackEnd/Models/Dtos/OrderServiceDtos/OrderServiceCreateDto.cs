@@ -9,4 +9,5 @@ public class OrderServiceCreateDto
     [Required]
     public int ServiceId { get; set; }
     public int? ResponsibleEmployeeId { get; set; }
+    public int? ComputerOnServiceId { get; set; }
 }

@@ -1,6 +1,5 @@
 using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
 using ComputerAssemblyServiceBackEnd.Data;
-using ComputerAssemblyServiceBackEnd.Enums.Models;
 using ComputerAssemblyServiceBackEnd.Filters.Models;
 using ComputerAssemblyServiceBackEnd.Models;
 using Microsoft.EntityFrameworkCore;

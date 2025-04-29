@@ -150,8 +150,11 @@ namespace CompAssemblyServiceWebApi.Controllers
             var productDtos = _mapper.Map<List<ProductDto>>(products.ToList());
             foreach (var (product, dto) in products.Zip(productDtos, (p, d) => (p, d)))
             {
-                dto.PrebuildPattern = _mapper.Map<PrebuildPatternDto>(product.Computer);
-                dto.PrebuildPattern.Components = _ppcs.GetComponentsForPattern(product.Computer, _mapper);
+                if (product.Computer != null)
+                {
+                    dto.PrebuildPattern = _mapper.Map<PrebuildPatternDto>(product.Computer);
+                    dto.PrebuildPattern.Components = _ppcs.GetComponentsForPattern(product.Computer, _mapper);
+                }
             }
             return productDtos;
         }

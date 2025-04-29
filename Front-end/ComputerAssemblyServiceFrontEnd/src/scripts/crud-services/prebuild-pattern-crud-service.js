@@ -7,13 +7,11 @@ export const createPrebuildPattern = async (prebuildPattern) => {
   try {
     checkIfUpsertPrebuildPatternValid(prebuildPattern);
 
-    await axios.post(apiUrl, prebuildPattern);
-
-    return true;
+    return (await axios.post(apiUrl, prebuildPattern)).data;
   } catch (err) {
     console.error(err);
 
-    return false;
+    return null;
   }
 };
 

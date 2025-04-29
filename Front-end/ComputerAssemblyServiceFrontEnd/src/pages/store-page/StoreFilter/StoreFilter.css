@@ -1,0 +1,77 @@
+.store-filter {
+  padding: 1rem;
+  background-color: #262626;
+  border-radius: 10px;
+  width: 100%;
+  height: fit-content;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.price-filter {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.store-filter input,
+select {
+  padding: 0.4rem;
+  width: 100%;
+  border: 1px solid #cecece;
+  border-radius: 6px;
+  background-color: #1f1f1f;
+}
+
+.component-group summary {
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+.component-group ul {
+
+  max-height: 135px;
+  height: fit-content;
+  overflow-y: auto;
+  list-style: none;
+  padding-left: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.component-group li {
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.component-group li label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  background-color: #1f1f1f;
+  border-radius: 4px;
+
+}
+
+.component-group li label span {
+  width: 100%;
+
+}
+
+
+/* .component-group li label:checked {
+  background-color: #eacf00;
+} */

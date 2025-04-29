@@ -183,3 +183,47 @@ export const deleteOrderItem = async (itemId) => {
     return false;
   }
 };
+
+export const createOrderService = async (orderService) => {
+  try {
+    const responce = await axios.post(`${apiUrl}OrderService`, orderService);
+    return responce.data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const processOrderService = async (user, isAuthorized, serviceId) => {
+  try {
+    const order = await getOrder(user, isAuthorized);
+
+    if (order) {
+      return await createOrderService({
+        orderId: order.orderId,
+        serviceId: serviceId,
+        responsibleEmployeeId: null,
+      });
+    }
+  } catch (err) {
+    if (err.message === "No existing order found") {
+      const newOrder = await createOrder(user, isAuthorized);
+      return await createOrderService({
+        orderId: newOrder.orderId,
+        serviceId: serviceId,
+        responsibleEmployeeId: null,
+      });
+    }
+  }
+};
+
+export const addOrderService = async (user, isAuthorized, serviceId) => {
+  return await processOrderService(user, isAuthorized, serviceId);
+};
+
+export const deleteOrderService = async (orderServiceId) => {
+  try {
+    await axios.delete(`${apiUrl}OrderService/${orderServiceId}`);
+  } catch (err) {
+    console.error(err);
+  }
+};

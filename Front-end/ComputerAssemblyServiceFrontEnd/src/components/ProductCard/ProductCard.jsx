@@ -25,9 +25,9 @@ export default function ProductCard({
 }) {
   const { user, isAuthorized } = useUser();
   const navigate = useNavigate();
-  const [isAdded, setIsAdded] = useState(false); // <--- додали стан
+  const [isAdded, setIsAdded] = useState(false);
 
-  const handleAddToCart = async (productId, price) => {
+  const handleAddToCart = async () => {
     if (!isAuthorized) {
       localStorage.setItem(
         "pendingCartItem",
@@ -40,12 +40,11 @@ export default function ProductCard({
 
     await addOrderItem(user, isAuthorized, productId, price);
 
-    // Після додавання в корзину
     setIsAdded(true);
 
     setTimeout(() => {
       setIsAdded(false);
-    }, 2000); // 5 секунд
+    }, 2000);
   };
 
   const characteristics = [
@@ -77,7 +76,7 @@ export default function ProductCard({
         <div className="product-actions">
           <button
             className={isAdded ? "added" : ""}
-            onClick={async () => await handleAddToCart(productId, price)}
+            onClick={async () => await handleAddToCart()}
           >
             {isAdded ? "Purchased!" : "Purchase"}
           </button>

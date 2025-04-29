@@ -1,4 +1,5 @@
 export const ProductType = {
   Computer: "Computer",
-  Component: "Component",
+  GamingPC: "GamingPC",
+  WorkStation: "WorkStation",
 };

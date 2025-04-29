@@ -17,7 +17,7 @@
   height: 43.8rem;
   overflow-y: auto;
   border-radius: 15px;
-  grid-column: 2/3;
+
   padding-top: 12px;
 }
 
@@ -32,4 +32,13 @@
   justify-content: center;
   align-items: center;
 
+}
+
+.cart-items.narrow {
+  grid-column: 2 / 3;
+}
+
+
+.cart-items.wide {
+  grid-column: 1 / -1;
 }

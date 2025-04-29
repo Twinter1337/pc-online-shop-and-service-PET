@@ -1,4 +1,3 @@
-using System.Runtime.Serialization;
 using NpgsqlTypes;
 
 namespace ComputerAssemblyServiceBackEnd.Enums.Models;

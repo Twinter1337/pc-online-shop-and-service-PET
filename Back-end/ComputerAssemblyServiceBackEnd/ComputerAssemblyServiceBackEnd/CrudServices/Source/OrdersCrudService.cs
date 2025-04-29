@@ -21,7 +21,7 @@ public class OrdersCrudService: CrudService<Order>
             query = query.Where(o => o.Status == filter.Status);
         }
 
-        if (filter.ClientId.HasValue || filter.ClientId == null)
+        if (filter.ClientId.HasValue)
         {
             query = query.Where(o => o.ClientId == filter.ClientId);
         }
@@ -41,9 +41,9 @@ public class OrdersCrudService: CrudService<Order>
             query = query.Where(o => o.CreatedAt >= filter.MinCreationDate);
         }
         
-        if (filter.MaxCreatioDate.HasValue)
+        if (filter.MaxCreationDate.HasValue)
         {
-            query = query.Where(o => o.CreatedAt <= filter.MaxCreatioDate);
+            query = query.Where(o => o.CreatedAt <= filter.MaxCreationDate);
         }
         
         return await query.Include(o => o.OrderItems)

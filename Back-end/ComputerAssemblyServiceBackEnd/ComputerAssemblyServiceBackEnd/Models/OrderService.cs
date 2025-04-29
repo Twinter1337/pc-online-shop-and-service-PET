@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ComputerAssemblyServiceBackEnd.Models;
+﻿namespace ComputerAssemblyServiceBackEnd.Models;
 
 public partial class OrderService
 {
@@ -12,6 +9,8 @@ public partial class OrderService
     public int ServiceId { get; set; }
 
     public int? ResponsibleEmployeeId { get; set; }
+    
+    public int? ComputerOnServiceId { get; set; }
 
     public virtual Order Order { get; set; } = null!;
 

@@ -63,4 +63,9 @@ public class EmployeesCrudService : CrudService<Employee>
                throw new
                    InvalidOperationException();
     }
+
+    public async Task<Employee?> GetEmployeeByUserId(int userId)
+    {
+        return await Context.Employees.FirstOrDefaultAsync(e => e.UserId == userId);
+    }
 }

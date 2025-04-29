@@ -1,0 +1,7 @@
+.orders-manage {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  height: fit-content;
+  max-height: 40rem;
+}

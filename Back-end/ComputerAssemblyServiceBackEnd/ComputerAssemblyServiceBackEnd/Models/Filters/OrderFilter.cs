@@ -10,6 +10,6 @@ public class OrderFilter
     
     public DateOnly? MinCreationDate { get; set; }
     
-    public DateOnly? MaxCreatioDate { get; set; }
+    public DateOnly? MaxCreationDate { get; set; }
     public OrderStatus? Status { get; set; }
 }

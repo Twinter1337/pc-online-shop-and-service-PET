@@ -22,8 +22,8 @@ export default function App() {
           <Header />
           <main>
             <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/store-page" element={<StorePage />} />
+              {/* <Route path="/" element={<HomePage />} /> */}
+              <Route path="/" element={<StorePage />} />
               <Route path="/service-page" element={<ServicePage />} />
               <Route path="/auth-page" element={<AuthPage />} />
               <Route path="/contact-page" element={<ContactPage />} />

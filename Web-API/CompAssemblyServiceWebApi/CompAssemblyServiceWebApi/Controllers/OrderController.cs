@@ -1,11 +1,13 @@
 using AutoMapper;
 using ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;
 using ComputerAssemblyServiceBackEnd.CrudServices.Source;
+using ComputerAssemblyServiceBackEnd.Enums.Models;
 using Microsoft.AspNetCore.Mvc;
 using ComputerAssemblyServiceBackEnd.Filters.Models;
 using ComputerAssemblyServiceBackEnd.Models;
 using ComputerAssemblyServiceBackEnd.Models.Dtos.OrderDtos;
 using ComputerAssemblyServiceBackEnd.Models.Dtos.PatchDtos;
+using QuestPDF.Fluent;
 
 namespace CompAssemblyServiceWebApi.Controllers
 {
@@ -73,6 +75,26 @@ namespace CompAssemblyServiceWebApi.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
+        }
+        
+        [HttpGet("OrdersReport/pdf")]
+        public async Task<IActionResult> GetPdfReport([FromQuery] DateOnly from, [FromQuery] DateOnly to)
+        {
+            var ocs = _orderCrudService as OrdersCrudService;
+            OrderFilter dateFilter = new OrderFilter()
+            {
+                MinCreationDate = from,
+                MaxCreationDate = to,
+            };
+            var orders = await ocs.GetFilteredOrdersAsync(dateFilter);
+            
+            var filteredByStatusOrders = orders.Where(o => o.Status != OrderStatus.New).ToList(); 
+
+            var document = new OrdersReportDocument(filteredByStatusOrders, from, to);
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+            var pdfBytes = document.GeneratePdf();
+
+            return File(pdfBytes, "application/pdf", $"orders_report_{from:yyyyMMdd}_{to:yyyyMMdd}.pdf");
         }
 
         [HttpPut("{id}")]

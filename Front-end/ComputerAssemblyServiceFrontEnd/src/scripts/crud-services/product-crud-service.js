@@ -102,12 +102,6 @@ const checkIfUpsertProductValid = (product) => {
     throw new Error("Invalid product category");
   }
   if (
-    product.componentId === undefined ||
-    (product.componentId !== null && typeof product.componentId !== "number")
-  ) {
-    throw new Error("Invalid componentId");
-  }
-  if (
     product.computerId === undefined ||
     (product.computerId !== null && typeof product.computerId !== "number")
   ) {
@@ -115,20 +109,6 @@ const checkIfUpsertProductValid = (product) => {
   }
   if (product.imgUrl === undefined || typeof product.imgUrl !== "string") {
     throw new Error("Invalid image url");
-  }
-  if (
-    product.category === ProductType.COMPONENT &&
-    (product.componentId === undefined || product.componentId === null) &&
-    product.computerId !== null
-  ) {
-    throw new Error("Invalid component product");
-  }
-  if (
-    product.category === ProductType.COMPUTER &&
-    (product.computerId === undefined || product.computerId === null) &&
-    product.componentId !== null
-  ) {
-    throw new Error("Invalid computer product");
   }
 };
 

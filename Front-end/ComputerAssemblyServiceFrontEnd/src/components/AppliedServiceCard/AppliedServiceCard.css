@@ -1,0 +1,34 @@
+.applied-service-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  background-color: #313131;
+  padding: 15px;
+  border-radius: 15px;
+}
+
+.needed-services-list {
+  display: flex;
+  flex-direction: column;
+  background-color: #272727;
+  height: fit-content;
+  max-height: 100px;
+  overflow-y: auto;
+  border-radius: 10px;
+  gap: 10px;
+  padding: 10px;
+}
+
+.service {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.checkbox-service {
+  width: 15px;
+  height: 15px;
+  accent-color: #eacf00;
+  cursor: pointer;
+}

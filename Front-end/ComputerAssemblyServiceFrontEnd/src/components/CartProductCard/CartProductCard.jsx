@@ -3,7 +3,9 @@ import "./CartProductCard.css";
 import {
   updateOrderItemQuantity,
   deleteOrderItem,
+  deleteOrderService,
 } from "../../scripts/services/order-service";
+import bucketImg from "../../assets/BucketPng/delete-48.png";
 
 export default function CartProductCard({
   imgUrl,
@@ -11,7 +13,8 @@ export default function CartProductCard({
   price,
   quantity: initialQuantity,
   itemId,
-  onRemove,
+  isService,
+  isRequest,
 }) {
   const [quantity, setQuantity] = useState(initialQuantity);
 
@@ -46,6 +49,14 @@ export default function CartProductCard({
     }
   };
 
+  const handleDeleteOrderService = async () => {
+    try {
+      await deleteOrderService(itemId);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <article className="cart-product-card">
       <div className="product-info">
@@ -54,19 +65,36 @@ export default function CartProductCard({
       </div>
       <div className="product-price-and-controls">
         <p className="product-in-cart-price">{price} UAH</p>
-        <button
-          className="button minus-product-quantity"
-          onClick={handleDecrease}
-        >
-          -
-        </button>
-        <p className="product-in-cart-quantity">{quantity}</p>
-        <button
-          className="button plus-product-quantity"
-          onClick={handleIncrease}
-        >
-          +
-        </button>
+        {isService === false ? (
+          <>
+            <button
+              className="button minus-product-quantity"
+              onClick={handleDecrease}
+            >
+              <strong>-</strong>
+            </button>
+            <p className="product-in-cart-quantity">{quantity}</p>
+            <button
+              className="button plus-product-quantity"
+              onClick={handleIncrease}
+            >
+              <strong>+</strong>
+            </button>
+          </>
+        ) : (
+          !isRequest && (
+            <button
+              className="button"
+              onClick={async () => await handleDeleteOrderService()}
+            >
+              <img
+                className="bucket-img-delete-button"
+                src={bucketImg}
+                alt="bucket image"
+              />
+            </button>
+          )
+        )}
       </div>
     </article>
   );

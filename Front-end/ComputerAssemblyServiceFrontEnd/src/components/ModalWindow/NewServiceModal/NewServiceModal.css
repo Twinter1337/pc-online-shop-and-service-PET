@@ -1,0 +1,6 @@
+.new-service-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 500px;
+}

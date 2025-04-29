@@ -97,20 +97,17 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Component>(entity =>
         {
-            entity.HasKey(e => e.ComponentId).
-                HasName("components_pkey");
-            
+            entity.HasKey(e => e.ComponentId).HasName("components_pkey");
+
             entity.Property(c => c.ComponentId)
                 .HasColumnName("component_id");
-            
+
             entity.Property(e => e.Manufacturer)
                 .HasMaxLength(50)
                 .HasColumnName("manufacturer");
-            
-            entity.Property(e => e.Model).
-                HasMaxLength(50).
-                HasColumnName("model");
-            
+
+            entity.Property(e => e.Model).HasMaxLength(50).HasColumnName("model");
+
             entity.Property(e => e.Price)
                 .HasPrecision(10, 2)
                 .HasColumnName("price");
@@ -118,10 +115,10 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Category)
                 .HasColumnType("component_type")
                 .HasColumnName("category");
-            
+
             entity.Property(e => e.QuantityOnStock)
                 .HasColumnName("quantity_on_stock");
-            
+
             entity.Property(e => e.Characteristics)
                 .HasColumnType("jsonb")
                 .HasColumnName("characteristics");
@@ -141,14 +138,14 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.ResponsibleEmployeeId)
                 .HasColumnName("responsible_employee_id");
-            
-            entity.Property(e=>e.ProblemDescription)
+
+            entity.Property(e => e.ProblemDescription)
                 .HasColumnName("problem_description");
 
             entity.Property(e => e.Status)
                 .HasColumnType("service_status")
                 .HasColumnName("status");
-            
+
             entity.HasOne(d => d.ResponsibleEmployee)
                 .WithMany(p => p.ComputersOnService)
                 .HasForeignKey(d => d.ResponsibleEmployeeId)
@@ -172,11 +169,11 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.PositionId)
                 .HasColumnName("position_id")
                 .HasDefaultValueSql("nextval('employeepositions_position_id_seq'::regclass)");
-            
+
             entity.Property(e => e.MaximumNumberOfEmpolyees)
                 .HasColumnName("maximum_number_of_empolyees")
                 .HasDefaultValue(1);
-            
+
             entity.Property(e => e.PositionName)
                 .HasColumnName("position_name")
                 .HasMaxLength(50);
@@ -212,7 +209,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("salary")
                 .HasPrecision(10, 2)
                 .HasDefaultValueSql("8000");
-            
+
             entity.HasOne(d => d.PositionNavigation)
                 .WithMany(p => p.Employees)
                 .HasForeignKey(d => d.Position)
@@ -263,6 +260,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.OrderServiceId)
                 .HasColumnName("order_service_id");
 
+            entity.Property(e => e.ComputerOnServiceId)
+                .HasColumnName("computer_on_service_id");
+
             entity.Property(e => e.OrderId)
                 .HasColumnName("order_id");
 
@@ -309,13 +309,13 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("status")
                 .HasColumnType("order_status");
 
-            entity.Property(e => e.ClientId) 
+            entity.Property(e => e.ClientId)
                 .HasColumnName("client_id");
 
             entity.HasOne(d => d.Client)
                 .WithMany(p => p.Orders)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("orders_client_id_fkey"); 
+                .HasConstraintName("orders_client_id_fkey");
         });
 
         modelBuilder.Entity<PatternComponent>(entity =>
@@ -423,7 +423,7 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.ComputerId, "products_computer_id_key")
                 .IsUnique();
-            
+
             entity.HasOne(d => d.Computer)
                 .WithOne(p => p.Product)
                 .HasForeignKey<Product>(d => d.ComputerId)
@@ -438,15 +438,15 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.ServiceId)
                 .HasColumnName("service_id");
-            
+
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("name");
-            
+
             entity.Property(e => e.Price)
                 .HasPrecision(10, 2)
                 .HasColumnName("price");
-            
+
             entity.Property(e => e.Description)
                 .HasColumnName("description");
         });
@@ -461,19 +461,19 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.UserId)
                 .HasColumnName("user_id");
-            
+
             entity.Property(e => e.Email)
                 .HasMaxLength(254)
                 .HasColumnName("email");
-            
+
             entity.Property(e => e.FirstName)
                 .HasMaxLength(50)
                 .HasColumnName("first_name");
-            
+
             entity.Property(e => e.LastName)
                 .HasMaxLength(50)
                 .HasColumnName("last_name");
-            
+
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(15)
                 .HasColumnName("phone_number");

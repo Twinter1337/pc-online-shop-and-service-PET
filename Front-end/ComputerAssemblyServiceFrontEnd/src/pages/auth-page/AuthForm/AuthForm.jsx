@@ -7,7 +7,10 @@ import { useUser } from "../../../contextes/UserContext";
 
 import "./AuthForm.css";
 import { UserRole } from "../../../scripts/enums/user-role";
-import { addOrderItem } from "../../../scripts/services/order-service.js";
+import {
+  addOrderItem,
+  addOrderService,
+} from "../../../scripts/services/order-service.js";
 
 const AuthForm = () => {
   const [step, setStep] = useState(1);
@@ -108,6 +111,19 @@ const AuthForm = () => {
           }
 
           localStorage.removeItem("pendingCartItem");
+        }
+        const pendingService = localStorage.getItem("pendingCartService");
+        if (pendingService) {
+          const { serviceId } = JSON.parse(pendingService);
+
+          try {
+            await addOrderService(userResponse.data, true, serviceId);
+            console.log("Pending service successfully added to cart");
+          } catch (error) {
+            console.error("Failed to add pending service:", error.message);
+          }
+
+          localStorage.removeItem("pendingCartService");
         }
 
         navigate("/user-page");

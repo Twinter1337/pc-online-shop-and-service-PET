@@ -75,3 +75,53 @@
 .service-card-button:hover {
   background-color: var(--primary-color-dark);
 }
+
+.service-card-button {
+  background-color: var(--button-background-color);
+  border: none;
+  border-radius: 15px;
+  width: auto;
+  padding: 0 13px;
+  height: 36px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 8px;
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease,
+    transform 0.3s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.service-card-button:hover {
+  background-color: var(--gray-color);
+}
+
+.service-card-button.added {
+  background-color: #eacf00;
+  color: white;
+}
+
+.service-card-button.added::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background-color: #faeb774b;
+  border-radius: 10px;
+  z-index: 0;
+  animation: fillButton 1s forwards ease-in-out;
+}
+
+@keyframes fillButton {
+  0% {
+    width: 0;
+  }
+
+  100% {
+    width: 100%;
+  }
+}

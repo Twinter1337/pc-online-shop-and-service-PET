@@ -1,0 +1,29 @@
+.service-request-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  background-color: #191919;
+  border-radius: 15px;
+  padding: 15px;
+  height: fit-content;
+}
+
+.services-info {
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  background-color: #222121;
+  border-radius: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 15px;
+  gap: 10px
+}
+
+
+.computer-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

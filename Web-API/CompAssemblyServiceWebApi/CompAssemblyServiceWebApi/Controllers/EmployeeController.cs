@@ -73,6 +73,27 @@ namespace CompAssemblyServiceWebApi.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        
+        [HttpGet("by-user-id/{userId}")]
+        public async Task<ActionResult<EmployeeDto>> GetEmployeeByUserId(int userId)
+        {
+            try
+            {
+                var ecs = _employeeCrudService as EmployeesCrudService;
+                var employee = await ecs.GetEmployeeByUserId(userId);
+
+                if (employee == null)
+                {
+                    return NotFound($"Employee with user ID {userId} not found.");
+                }
+
+                return Ok(_mapper.Map<EmployeeDto>(employee));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
         [HttpGet("get-user/{employeeId}")]
         public async Task<ActionResult<EmployeeDto>> GetUserByEmployeeId(int employeeId)

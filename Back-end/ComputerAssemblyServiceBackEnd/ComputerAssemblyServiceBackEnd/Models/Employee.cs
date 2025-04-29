@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ComputerAssemblyServiceBackEnd.Models;
+﻿namespace ComputerAssemblyServiceBackEnd.Models;
 
 public partial class Employee
 {

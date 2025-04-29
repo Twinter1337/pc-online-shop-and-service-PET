@@ -1,0 +1,26 @@
+.order-card-for-managing {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #393939;
+  border-radius: 10px;
+  padding: 15px;
+  width: 35rem;
+}
+
+.order-card-for-managing select {
+  background-color: #2c2c2c;
+  border-radius: 10px;
+
+  width: 150px;
+
+  &:focus {
+    border-color: #eacf00;
+  }
+}
+
+.order-managing-controls {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}

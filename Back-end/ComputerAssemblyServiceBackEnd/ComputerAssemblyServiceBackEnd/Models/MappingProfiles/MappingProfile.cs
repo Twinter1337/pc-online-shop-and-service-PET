@@ -1,9 +1,7 @@
 using AutoMapper;
 using ComputerAssemblyServiceBackEnd.Models;
-using ComputerAssemblyServiceBackEnd.Models.Dtos;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using ComputerAssemblyServiceBackEnd.Enums.Models;
 using ComputerAssemblyServiceBackEnd.Models.Dtos.ComponentDtos;
 using ComputerAssemblyServiceBackEnd.Models.Dtos.ComputerOnServiceDtos;
 using ComputerAssemblyServiceBackEnd.Models.Dtos.EmployeeDtos;

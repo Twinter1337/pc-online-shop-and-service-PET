@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ComputerAssemblyServiceBackEnd.Enums.Models;
+﻿using ComputerAssemblyServiceBackEnd.Enums.Models;
 
 namespace ComputerAssemblyServiceBackEnd.Models;
 

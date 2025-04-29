@@ -4,7 +4,8 @@ import "./HomePage.css";
 export default function HomePage() {
   return (
     <Page>
-      <p>Hello Home!</p>
+      <h1>Home</h1>
+      <div className="line-br" />
     </Page>
   );
 }

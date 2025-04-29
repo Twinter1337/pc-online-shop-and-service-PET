@@ -5,14 +5,14 @@
   background-color: #313131;
   align-items: center;
   justify-content: space-between;
-  padding: 10px;
+  padding: 15px;
   font-size: 1.5rem;
 }
 
 .product-info {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 2rem;
 }
 
 .product-in-cart-img {
@@ -23,8 +23,7 @@
 .button {
   background-color: var(--button-background-color);
   color: var(--font-color);
-  border-radius: 100%;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.8rem;
   font-size: 1.2rem;
   border: none;
   cursor: pointer;
@@ -40,4 +39,8 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.bucket-img-delete-button {
+  height: 30px;
 }

@@ -31,6 +31,9 @@
   max-width: 300px;
   min-width: 200px;
 
+  max-height: fit-content;
+  min-height: fit-content;
+
   font-family: sans-serif;
 }
 

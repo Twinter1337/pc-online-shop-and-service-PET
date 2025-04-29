@@ -1,5 +1,4 @@
 using ComputerAssemblyServiceBackEnd.Data;
-using ComputerAssemblyServiceBackEnd.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ComputerAssemblyServiceBackEnd.CrudServices.Interfaces;

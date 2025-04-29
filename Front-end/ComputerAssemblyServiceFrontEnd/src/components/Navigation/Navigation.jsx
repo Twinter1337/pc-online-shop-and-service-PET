@@ -9,8 +9,8 @@ import servicePageImg from "../../assets/ServicePng/computer-support-24.png";
 export default function Navigation() {
   return (
     <nav>
-      <NavigationLink image={homePageImg} title="Home" to="/" />
-      <NavigationLink image={storePageImg} title="Store" to="/store-page" />
+      {/* <NavigationLink image={homePageImg} title="Home" to="/" /> */}
+      <NavigationLink image={storePageImg} title="Store" to="/" />
       <NavigationLink
         image={servicePageImg}
         title="Service"

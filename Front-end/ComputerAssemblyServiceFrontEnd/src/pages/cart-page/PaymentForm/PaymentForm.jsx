@@ -8,7 +8,6 @@ export default function PaymentForm({ onSubmit, user }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
-  // Якщо користувач авторизований, заповнюємо його ім'я та прізвище
   useEffect(() => {
     if (user && user.firstName && user.lastName) {
       setFirstName(user.firstName);
@@ -25,12 +24,13 @@ export default function PaymentForm({ onSubmit, user }) {
       firstName,
       lastName,
     };
-    onSubmit(paymentDetails); // Передаємо дані в батьківський компонент
+    onSubmit(paymentDetails);
   };
 
   return (
     <form className="payment-form panel" onSubmit={handleSubmit}>
       <h2>Payment Information</h2>
+      <div className="line-br"></div>
 
       <div className="form-group">
         <label htmlFor="cardNumber">Card Number</label>
@@ -91,7 +91,7 @@ export default function PaymentForm({ onSubmit, user }) {
           required
         />
       </div>
-
+      <div className="line-br"></div>
       <button type="submit" className="button payment-button">
         Confirm Payment
       </button>
