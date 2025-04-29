@@ -56,8 +56,9 @@ export default function ProductCard({
 
   return (
     <article className="product-card">
-      <img src={imageUrl} alt={title} className="product-image" />
-
+      <div className="product-img-container">
+        <img src={imageUrl} alt={title} className="product-image" />
+      </div>
       <h2 className="product-title">{title}</h2>
       <div className="line"></div>
       <div className="product-specs">

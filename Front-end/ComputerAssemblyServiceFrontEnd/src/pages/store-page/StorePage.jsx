@@ -23,7 +23,7 @@ export default function StorePage() {
     selectedComponents: [],
   });
 
-  const PRODUCTS_PER_PAGE = 16;
+  const PRODUCTS_PER_PAGE = 15;
 
   useEffect(() => {
     productCrudService

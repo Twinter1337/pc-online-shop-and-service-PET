@@ -28,7 +28,7 @@
   padding: 20px;
   width: auto;
 
-  max-width: 300px;
+  max-width: 100%;
   min-width: 200px;
 
   max-height: fit-content;
@@ -55,9 +55,9 @@
 }
 
 .product-image {
-  width: 100%;
+  width: 300px;
+  max-height: 300px;
   border-radius: 12px;
-  margin-bottom: 16px;
 }
 
 .product-title {
@@ -136,4 +136,9 @@
   100% {
     width: 100%;
   }
+}
+
+.product-img-container {
+  display: flex;
+  justify-content: center;
 }
