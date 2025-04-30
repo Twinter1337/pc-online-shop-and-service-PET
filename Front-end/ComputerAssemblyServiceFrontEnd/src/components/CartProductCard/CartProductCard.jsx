@@ -15,6 +15,7 @@ export default function CartProductCard({
   itemId,
   isService,
   isRequest,
+  onChange,
 }) {
   const [quantity, setQuantity] = useState(initialQuantity);
 
@@ -24,6 +25,7 @@ export default function CartProductCard({
 
     try {
       await updateOrderItemQuantity(itemId, newQuantity);
+      onChange?.();
     } catch (error) {
       console.error("Failed to update quantity:", error);
     }
@@ -37,12 +39,14 @@ export default function CartProductCard({
 
       try {
         await updateOrderItemQuantity(itemId, newQuantity);
+        onChange?.();
       } catch (error) {
         console.error("Failed to update quantity:", error);
       }
     } else {
       try {
         await deleteOrderItem(itemId);
+        onChange?.();
       } catch (error) {
         console.error("Failed to delete item:", error);
       }
@@ -52,6 +56,7 @@ export default function CartProductCard({
   const handleDeleteOrderService = async () => {
     try {
       await deleteOrderService(itemId);
+      onChange?.();
     } catch (err) {
       console.error(err);
     }

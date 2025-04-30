@@ -46,6 +46,8 @@ export default function ServiceRequestCard({
           }
         );
       });
+
+      onApply?.();
     } catch (err) {
       console.error(err);
     }

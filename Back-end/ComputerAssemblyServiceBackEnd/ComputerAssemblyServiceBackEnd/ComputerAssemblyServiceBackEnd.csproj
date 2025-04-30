@@ -21,6 +21,7 @@
       </PackageReference>
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
       <PackageReference Include="QuestPDF" Version="2025.4.0" />
+      <PackageReference Include="ScottPlot" Version="5.0.55" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.8.0" />
     </ItemGroup>
 

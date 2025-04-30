@@ -41,7 +41,7 @@ export default function ServicePage() {
     };
 
     fetchData();
-  }, [user, computersOnService]);
+  }, [user]);
 
   const filteredServices = servicesData.filter((service) =>
     service.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -99,6 +99,16 @@ export default function ServicePage() {
                     key={computer.computerOnServiceId}
                     computerOnService={computer}
                     orderServices={relatedOrderServices}
+                    onApply={() => {
+                      // локально оновлюємо список
+                      setComputersOnService((prev) =>
+                        prev.map((c) =>
+                          c.computerOnServiceId === computer.computerOnServiceId
+                            ? { ...c, responsibleEmployeeId: user.userId } // оновлюємо відповідального
+                            : c
+                        )
+                      );
+                    }}
                   />
                 );
               })

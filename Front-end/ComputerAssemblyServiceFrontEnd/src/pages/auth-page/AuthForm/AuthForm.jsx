@@ -164,7 +164,7 @@ const AuthForm = () => {
               {renderInput("Last name*", "lastName", "text", {
                 required: "The field is required",
               })}
-              <button type="submit" className="button">
+              <button type="submit" className="button submit-email-button">
                 Continue
               </button>
               <button type="button" className="button" onClick={backStep}>
@@ -183,7 +183,7 @@ const AuthForm = () => {
                 required: "The field is required",
                 minLength: { value: 5, message: "Code must be 5 characters" },
               })}
-              <button type="submit" className="button">
+              <button type="submit" className="button submit-email-button">
                 Submit
               </button>
               <button type="button" className="button" onClick={backStep}>

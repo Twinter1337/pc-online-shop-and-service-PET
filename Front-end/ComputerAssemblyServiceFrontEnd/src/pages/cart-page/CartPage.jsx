@@ -33,7 +33,19 @@ export default function CartPage() {
     };
 
     fetchNewOrder();
-  }, [user, newOrder]);
+  }, [user]);
+
+  const refreshOrder = async () => {
+    try {
+      const orders = await getOrdersByUserId(user.userId);
+      const orderWithStatusNew = orders.find(
+        (order) => order.status === OrderStatus.New
+      );
+      setNewOrder(orderWithStatusNew);
+    } catch (error) {
+      console.error("Failed to refresh orders:", error);
+    }
+  };
 
   const handlePaymentSubmit = async () => {
     const newPayment = {
@@ -78,6 +90,8 @@ export default function CartPage() {
           }
         }
       }
+
+      await refreshOrder();
     } catch (err) {
       console.error(err);
     }
@@ -113,6 +127,7 @@ export default function CartPage() {
                   quantity={orderItem.quantity}
                   itemId={orderItem.itemId}
                   isService={false}
+                  onChange={refreshOrder}
                 />
               ))}
 
@@ -124,6 +139,7 @@ export default function CartPage() {
                 price={orderService.service.price}
                 itemId={orderService.orderServiceId}
                 isService={true}
+                onChange={refreshOrder}
               />
             ))}
           </>
