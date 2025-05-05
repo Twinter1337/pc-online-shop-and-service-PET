@@ -1,4 +1,5 @@
-﻿using ComputerAssemblyServiceBackEnd.Enums.Models;
+﻿using System.Xml.Serialization;
+using ComputerAssemblyServiceBackEnd.Enums.Models;
 
 namespace ComputerAssemblyServiceBackEnd.Models;
 
@@ -14,5 +15,6 @@ public partial class Product
 
     public virtual PrebuildPattern? Computer { get; set; }
 
+    [XmlIgnore]
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

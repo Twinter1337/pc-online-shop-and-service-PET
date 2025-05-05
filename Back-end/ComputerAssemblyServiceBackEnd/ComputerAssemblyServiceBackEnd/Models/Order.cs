@@ -1,4 +1,5 @@
-﻿using ComputerAssemblyServiceBackEnd.Enums.Models;
+﻿using System.Xml.Serialization;
+using ComputerAssemblyServiceBackEnd.Enums.Models;
 
 namespace ComputerAssemblyServiceBackEnd.Models;
 
@@ -16,9 +17,12 @@ public partial class Order
     
     public virtual User? Client { get; set; }
 
+    [XmlIgnore]
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
+    [XmlIgnore]
     public virtual ICollection<OrderService> OrderServices { get; set; } = new List<OrderService>();
 
+    [XmlIgnore]
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 }

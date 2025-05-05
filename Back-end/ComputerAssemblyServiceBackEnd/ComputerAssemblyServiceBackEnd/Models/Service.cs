@@ -1,4 +1,6 @@
-﻿namespace ComputerAssemblyServiceBackEnd.Models;
+﻿using System.Xml.Serialization;
+
+namespace ComputerAssemblyServiceBackEnd.Models;
 
 public partial class Service
 {
@@ -10,5 +12,6 @@ public partial class Service
 
     public decimal Price { get; set; }
 
+    [XmlIgnore]
     public virtual ICollection<OrderService> OrderServices { get; set; } = new List<OrderService>();
 }

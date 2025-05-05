@@ -1,4 +1,6 @@
-﻿namespace ComputerAssemblyServiceBackEnd.Models;
+﻿using System.Xml.Serialization;
+
+namespace ComputerAssemblyServiceBackEnd.Models;
 
 public partial class EmployeePosition
 {
@@ -8,5 +10,6 @@ public partial class EmployeePosition
 
     public int MaximumNumberOfEmpolyees { get; set; }
 
+    [XmlIgnore]
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
 }

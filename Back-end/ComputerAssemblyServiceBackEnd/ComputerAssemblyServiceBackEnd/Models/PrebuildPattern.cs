@@ -1,4 +1,6 @@
-﻿namespace ComputerAssemblyServiceBackEnd.Models;
+﻿using System.Xml.Serialization;
+
+namespace ComputerAssemblyServiceBackEnd.Models;
 
 public partial class PrebuildPattern
 {
@@ -12,6 +14,7 @@ public partial class PrebuildPattern
 
     public decimal BasePrice { get; set; }
 
+    [XmlIgnore]
     public virtual ICollection<PatternComponent> PatternComponents { get; set; } = new List<PatternComponent>();
 
     public virtual Product? Product { get; set; }

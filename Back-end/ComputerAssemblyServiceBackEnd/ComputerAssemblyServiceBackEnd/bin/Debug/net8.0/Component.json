@@ -1,0 +1,1006 @@
+[
+  {
+    "ComponentId": 1,
+    "Manufacturer": "Intel",
+    "Model": "Core i9-14900K",
+    "QuantityOnStock": 100,
+    "Price": 23500.00,
+    "Category": 1,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 2,
+    "Manufacturer": "Intel",
+    "Model": "Core i7-14700K",
+    "QuantityOnStock": 100,
+    "Price": 18000.00,
+    "Category": 1,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 3,
+    "Manufacturer": "Intel",
+    "Model": "Core i5-14600K",
+    "QuantityOnStock": 100,
+    "Price": 13000.00,
+    "Category": 1,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 4,
+    "Manufacturer": "AMD",
+    "Model": "Ryzen 9 9950X3D",
+    "QuantityOnStock": 100,
+    "Price": 26000.00,
+    "Category": 1,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 5,
+    "Manufacturer": "AMD",
+    "Model": "Ryzen 7 9800X3D",
+    "QuantityOnStock": 100,
+    "Price": 21000.00,
+    "Category": 1,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 6,
+    "Manufacturer": "AMD",
+    "Model": "Ryzen 5 9700X",
+    "QuantityOnStock": 100,
+    "Price": 15000.00,
+    "Category": 1,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 7,
+    "Manufacturer": "Intel",
+    "Model": "Core i9-13900K",
+    "QuantityOnStock": 100,
+    "Price": 20000.00,
+    "Category": 1,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 8,
+    "Manufacturer": "Intel",
+    "Model": "Core i7-13700K",
+    "QuantityOnStock": 100,
+    "Price": 16000.00,
+    "Category": 1,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 9,
+    "Manufacturer": "AMD",
+    "Model": "Ryzen 7 8700G",
+    "QuantityOnStock": 100,
+    "Price": 13500.00,
+    "Category": 1,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 10,
+    "Manufacturer": "AMD",
+    "Model": "Ryzen 5 7600",
+    "QuantityOnStock": 100,
+    "Price": 10000.00,
+    "Category": 1,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 11,
+    "Manufacturer": "NVIDIA",
+    "Model": "RTX 5090",
+    "QuantityOnStock": 50,
+    "Price": 80000.00,
+    "Category": 0,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 12,
+    "Manufacturer": "NVIDIA",
+    "Model": "RTX 5080",
+    "QuantityOnStock": 50,
+    "Price": 65000.00,
+    "Category": 0,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 13,
+    "Manufacturer": "NVIDIA",
+    "Model": "RTX 5070 Ti",
+    "QuantityOnStock": 50,
+    "Price": 50000.00,
+    "Category": 0,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 14,
+    "Manufacturer": "AMD",
+    "Model": "Radeon RX 9070 XT",
+    "QuantityOnStock": 50,
+    "Price": 45000.00,
+    "Category": 0,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 15,
+    "Manufacturer": "AMD",
+    "Model": "Radeon RX 7900 XT",
+    "QuantityOnStock": 50,
+    "Price": 40000.00,
+    "Category": 0,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 16,
+    "Manufacturer": "NVIDIA",
+    "Model": "RTX 4070 Ti Super",
+    "QuantityOnStock": 50,
+    "Price": 35000.00,
+    "Category": 0,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 17,
+    "Manufacturer": "AMD",
+    "Model": "Radeon RX 7800 XT",
+    "QuantityOnStock": 50,
+    "Price": 30000.00,
+    "Category": 0,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 18,
+    "Manufacturer": "NVIDIA",
+    "Model": "RTX 4060 Ti",
+    "QuantityOnStock": 50,
+    "Price": 25000.00,
+    "Category": 0,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 19,
+    "Manufacturer": "AMD",
+    "Model": "Radeon RX 7700 XT",
+    "QuantityOnStock": 50,
+    "Price": 22000.00,
+    "Category": 0,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 20,
+    "Manufacturer": "NVIDIA",
+    "Model": "RTX 3050",
+    "QuantityOnStock": 100,
+    "Price": 15000.00,
+    "Category": 0,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 21,
+    "Manufacturer": "Seagate",
+    "Model": "IronWolf 4TB",
+    "QuantityOnStock": 40,
+    "Price": 3200.00,
+    "Category": 4,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 22,
+    "Manufacturer": "Western Digital",
+    "Model": "Red 6TB",
+    "QuantityOnStock": 40,
+    "Price": 4500.00,
+    "Category": 4,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 23,
+    "Manufacturer": "Toshiba",
+    "Model": "X300 8TB",
+    "QuantityOnStock": 40,
+    "Price": 5800.00,
+    "Category": 4,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 24,
+    "Manufacturer": "Seagate",
+    "Model": "Barracuda 1TB",
+    "QuantityOnStock": 60,
+    "Price": 1500.00,
+    "Category": 4,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 25,
+    "Manufacturer": "Western Digital",
+    "Model": "Blue 2TB",
+    "QuantityOnStock": 60,
+    "Price": 2000.00,
+    "Category": 4,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 26,
+    "Manufacturer": "Toshiba",
+    "Model": "P300 1TB",
+    "QuantityOnStock": 60,
+    "Price": 1400.00,
+    "Category": 4,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 27,
+    "Manufacturer": "Seagate",
+    "Model": "SkyHawk 2TB",
+    "QuantityOnStock": 60,
+    "Price": 2500.00,
+    "Category": 4,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 28,
+    "Manufacturer": "Western Digital",
+    "Model": "Black 4TB",
+    "QuantityOnStock": 60,
+    "Price": 4000.00,
+    "Category": 4,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 29,
+    "Manufacturer": "Toshiba",
+    "Model": "N300 6TB",
+    "QuantityOnStock": 60,
+    "Price": 5000.00,
+    "Category": 4,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 30,
+    "Manufacturer": "Seagate",
+    "Model": "Exos 10TB",
+    "QuantityOnStock": 40,
+    "Price": 8000.00,
+    "Category": 4,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 31,
+    "Manufacturer": "Samsung",
+    "Model": "990 Pro 1TB",
+    "QuantityOnStock": 70,
+    "Price": 5000.00,
+    "Category": 5,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 32,
+    "Manufacturer": "WDS",
+    "Model": "Black SN850X 2TB",
+    "QuantityOnStock": 70,
+    "Price": 7500.00,
+    "Category": 5,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 33,
+    "Manufacturer": "Kingston",
+    "Model": "KC3000 1TB",
+    "QuantityOnStock": 70,
+    "Price": 4500.00,
+    "Category": 5,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 34,
+    "Manufacturer": "Crucial",
+    "Model": "P5 Plus 2TB",
+    "QuantityOnStock": 70,
+    "Price": 6000.00,
+    "Category": 5,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 35,
+    "Manufacturer": "Samsung",
+    "Model": "980 500GB",
+    "QuantityOnStock": 70,
+    "Price": 2500.00,
+    "Category": 5,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 36,
+    "Manufacturer": "WDS",
+    "Model": "Blue SN570 1TB",
+    "QuantityOnStock": 70,
+    "Price": 3000.00,
+    "Category": 5,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 37,
+    "Manufacturer": "Kingston",
+    "Model": "NV2 2TB",
+    "QuantityOnStock": 70,
+    "Price": 5500.00,
+    "Category": 5,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 38,
+    "Manufacturer": "Crucial",
+    "Model": "MX500 1TB",
+    "QuantityOnStock": 70,
+    "Price": 3800.00,
+    "Category": 5,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 39,
+    "Manufacturer": "Samsung",
+    "Model": "870 EVO 2TB",
+    "QuantityOnStock": 70,
+    "Price": 6200.00,
+    "Category": 5,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 40,
+    "Manufacturer": "WDS",
+    "Model": "Green SN350 1TB",
+    "QuantityOnStock": 70,
+    "Price": 2800.00,
+    "Category": 5,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 41,
+    "Manufacturer": "Corsair",
+    "Model": "Vengeance LPX 16GB DDR4",
+    "QuantityOnStock": 80,
+    "Price": 2000.00,
+    "Category": 2,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 42,
+    "Manufacturer": "G.Skill",
+    "Model": "Trident Z RGB 32GB DDR5",
+    "QuantityOnStock": 80,
+    "Price": 4500.00,
+    "Category": 2,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 43,
+    "Manufacturer": "Kingston",
+    "Model": "Fury Beast 16GB DDR4",
+    "QuantityOnStock": 80,
+    "Price": 2200.00,
+    "Category": 2,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 44,
+    "Manufacturer": "Crucial",
+    "Model": "Ballistix 32GB DDR4",
+    "QuantityOnStock": 80,
+    "Price": 4000.00,
+    "Category": 2,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 45,
+    "Manufacturer": "Corsair",
+    "Model": "Dominator Platinum 64GB DDR5",
+    "QuantityOnStock": 80,
+    "Price": 8000.00,
+    "Category": 2,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 46,
+    "Manufacturer": "G.Skill",
+    "Model": "Ripjaws V 16GB DDR4",
+    "QuantityOnStock": 80,
+    "Price": 2100.00,
+    "Category": 2,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 47,
+    "Manufacturer": "Kingston",
+    "Model": "HyperX Predator 32GB DDR4",
+    "QuantityOnStock": 80,
+    "Price": 4200.00,
+    "Category": 2,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 48,
+    "Manufacturer": "Crucial",
+    "Model": "DDR5 16GB",
+    "QuantityOnStock": 80,
+    "Price": 3000.00,
+    "Category": 2,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 49,
+    "Manufacturer": "Corsair",
+    "Model": "Vengeance RGB Pro 32GB DDR4",
+    "QuantityOnStock": 80,
+    "Price": 4300.00,
+    "Category": 2,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 50,
+    "Manufacturer": "G.Skill",
+    "Model": "Trident Z5 64GB DDR5",
+    "QuantityOnStock": 80,
+    "Price": 9000.00,
+    "Category": 2,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 51,
+    "Manufacturer": "Seasonic",
+    "Model": "Focus GX-750",
+    "QuantityOnStock": 60,
+    "Price": 3500.00,
+    "Category": 6,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 52,
+    "Manufacturer": "be quiet!",
+    "Model": "Pure Power 11 700W",
+    "QuantityOnStock": 60,
+    "Price": 3000.00,
+    "Category": 6,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 53,
+    "Manufacturer": "Corsair",
+    "Model": "RM850x",
+    "QuantityOnStock": 60,
+    "Price": 4000.00,
+    "Category": 6,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 54,
+    "Manufacturer": "EVGA",
+    "Model": "SuperNOVA 750 G5",
+    "QuantityOnStock": 60,
+    "Price": 3800.00,
+    "Category": 6,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 55,
+    "Manufacturer": "Thermaltake",
+    "Model": "Toughpower GF1 650W",
+    "QuantityOnStock": 60,
+    "Price": 3200.00,
+    "Category": 6,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 56,
+    "Manufacturer": "Cooler Master",
+    "Model": "MWE Gold 650W",
+    "QuantityOnStock": 60,
+    "Price": 2800.00,
+    "Category": 6,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 57,
+    "Manufacturer": "ASUS",
+    "Model": "ROG Strix 850W",
+    "QuantityOnStock": 60,
+    "Price": 4500.00,
+    "Category": 6,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 58,
+    "Manufacturer": "MSI",
+    "Model": "MPG A850GF",
+    "QuantityOnStock": 60,
+    "Price": 4200.00,
+    "Category": 6,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 59,
+    "Manufacturer": "NZXT",
+    "Model": "C750",
+    "QuantityOnStock": 60,
+    "Price": 3600.00,
+    "Category": 6,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 60,
+    "Manufacturer": "Antec",
+    "Model": "Earthwatts Gold Pro 750W",
+    "QuantityOnStock": 60,
+    "Price": 3400.00,
+    "Category": 6,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 61,
+    "Manufacturer": "NZXT",
+    "Model": "H510",
+    "QuantityOnStock": 50,
+    "Price": 2500.00,
+    "Category": 7,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 62,
+    "Manufacturer": "Fractal Design",
+    "Model": "Meshify C",
+    "QuantityOnStock": 50,
+    "Price": 2800.00,
+    "Category": 7,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 63,
+    "Manufacturer": "Phanteks",
+    "Model": "Eclipse P400A",
+    "QuantityOnStock": 50,
+    "Price": 3000.00,
+    "Category": 7,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 64,
+    "Manufacturer": "Cooler Master",
+    "Model": "MasterBox NR600",
+    "QuantityOnStock": 50,
+    "Price": 2700.00,
+    "Category": 7,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 65,
+    "Manufacturer": "Lian Li",
+    "Model": "PC-O11 Dynamic",
+    "QuantityOnStock": 50,
+    "Price": 4000.00,
+    "Category": 7,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 66,
+    "Manufacturer": "be quiet!",
+    "Model": "Pure Base 500DX",
+    "QuantityOnStock": 50,
+    "Price": 3200.00,
+    "Category": 7,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 67,
+    "Manufacturer": "Corsair",
+    "Model": "4000D Airflow",
+    "QuantityOnStock": 50,
+    "Price": 3500.00,
+    "Category": 7,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 68,
+    "Manufacturer": "Thermaltake",
+    "Model": "V200 TG RGB",
+    "QuantityOnStock": 50,
+    "Price": 2900.00,
+    "Category": 7,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 69,
+    "Manufacturer": "ASUS",
+    "Model": "TUF Gaming GT501",
+    "QuantityOnStock": 50,
+    "Price": 4500.00,
+    "Category": 7,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 70,
+    "Manufacturer": "MSI",
+    "Model": "MPG GUNGNIR 110R",
+    "QuantityOnStock": 50,
+    "Price": 3800.00,
+    "Category": 7,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 71,
+    "Manufacturer": "Noctua",
+    "Model": "NH-D15",
+    "QuantityOnStock": 40,
+    "Price": 3500.00,
+    "Category": 8,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 72,
+    "Manufacturer": "be quiet!",
+    "Model": "Dark Rock Pro 4",
+    "QuantityOnStock": 40,
+    "Price": 3200.00,
+    "Category": 8,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 73,
+    "Manufacturer": "Deepcool",
+    "Model": "AK620",
+    "QuantityOnStock": 40,
+    "Price": 2800.00,
+    "Category": 8,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 74,
+    "Manufacturer": "Cooler Master",
+    "Model": "Hyper 212 Black Edition",
+    "QuantityOnStock": 40,
+    "Price": 1500.00,
+    "Category": 8,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 75,
+    "Manufacturer": "Arctic",
+    "Model": "Freezer 34 eSports DUO",
+    "QuantityOnStock": 40,
+    "Price": 1800.00,
+    "Category": 8,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 76,
+    "Manufacturer": "NZXT",
+    "Model": "Kraken X63",
+    "QuantityOnStock": 40,
+    "Price": 4000.00,
+    "Category": 8,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 77,
+    "Manufacturer": "Corsair",
+    "Model": "H100i RGB Platinum",
+    "QuantityOnStock": 40,
+    "Price": 4200.00,
+    "Category": 8,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 78,
+    "Manufacturer": "Thermaltake",
+    "Model": "Floe DX 360",
+    "QuantityOnStock": 40,
+    "Price": 4500.00,
+    "Category": 8,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 79,
+    "Manufacturer": "Scythe",
+    "Model": "Mugen 5 Rev.B",
+    "QuantityOnStock": 40,
+    "Price": 2200.00,
+    "Category": 8,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 80,
+    "Manufacturer": "MSI",
+    "Model": "MAG CoreLiquid 240R",
+    "QuantityOnStock": 40,
+    "Price": 3600.00,
+    "Category": 8,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 81,
+    "Manufacturer": "ASUS",
+    "Model": "ROG Strix Z690-E",
+    "QuantityOnStock": 50,
+    "Price": 15000.00,
+    "Category": 3,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 82,
+    "Manufacturer": "MSI",
+    "Model": "MAG Z590 TOMAHAWK WIFI",
+    "QuantityOnStock": 50,
+    "Price": 10000.00,
+    "Category": 3,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 83,
+    "Manufacturer": "Gigabyte",
+    "Model": "Z490 AORUS Master",
+    "QuantityOnStock": 50,
+    "Price": 12000.00,
+    "Category": 3,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 84,
+    "Manufacturer": "ASRock",
+    "Model": "B550 Phantom Gaming 4",
+    "QuantityOnStock": 50,
+    "Price": 7500.00,
+    "Category": 3,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 85,
+    "Manufacturer": "MSI",
+    "Model": "X570-A PRO",
+    "QuantityOnStock": 50,
+    "Price": 8000.00,
+    "Category": 3,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 86,
+    "Manufacturer": "Gigabyte",
+    "Model": "Z590 AORUS ELITE",
+    "QuantityOnStock": 50,
+    "Price": 9500.00,
+    "Category": 3,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 87,
+    "Manufacturer": "ASUS",
+    "Model": "TUF Gaming B550-PLUS",
+    "QuantityOnStock": 50,
+    "Price": 8500.00,
+    "Category": 3,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 88,
+    "Manufacturer": "ASRock",
+    "Model": "Z590 Taichi",
+    "QuantityOnStock": 50,
+    "Price": 11000.00,
+    "Category": 3,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 89,
+    "Manufacturer": "MSI",
+    "Model": "B450 TOMAHAWK MAX",
+    "QuantityOnStock": 50,
+    "Price": 5000.00,
+    "Category": 3,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 90,
+    "Manufacturer": "Gigabyte",
+    "Model": "B550 AORUS PRO",
+    "QuantityOnStock": 50,
+    "Price": 6500.00,
+    "Category": 3,
+    "Characteristics": {},
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 91,
+    "Manufacturer": "NVIDIA",
+    "Model": "RTX 2060 SUPER",
+    "QuantityOnStock": 100,
+    "Price": 15000.00,
+    "Category": 0,
+    "Characteristics": {
+      "memory": "8",
+      "interface": "PCIe",
+      "clockSpeed": "3600"
+    },
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 92,
+    "Manufacturer": "Cooler Master",
+    "Model": "Ryzen 9 7950X",
+    "QuantityOnStock": 26,
+    "Price": 10396.59,
+    "Category": 1,
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 93,
+    "Manufacturer": "Corsair",
+    "Model": "Liquid Cooler 194mm",
+    "QuantityOnStock": 6,
+    "Price": 16179.19,
+    "Category": 8,
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 94,
+    "Manufacturer": "MSI",
+    "Model": "Rippin and Sons 1041GB NVMe",
+    "QuantityOnStock": 38,
+    "Price": 8877.00,
+    "Category": 5,
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 95,
+    "Manufacturer": "Corsair",
+    "Model": "56GB DDR4 2973MHz",
+    "QuantityOnStock": 22,
+    "Price": 24607.67,
+    "Category": 2,
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 96,
+    "Manufacturer": "Corsair",
+    "Model": "Arc A770",
+    "QuantityOnStock": 48,
+    "Price": 18437.29,
+    "Category": 0,
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 97,
+    "Manufacturer": "ASUS",
+    "Model": "709W 80\u002B Gold",
+    "QuantityOnStock": 6,
+    "Price": 17434.68,
+    "Category": 6,
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 98,
+    "Manufacturer": "Samsung",
+    "Model": "4TB SATA HDD",
+    "QuantityOnStock": 12,
+    "Price": 5808.61,
+    "Category": 4,
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 99,
+    "Manufacturer": "Gigabyte",
+    "Model": "red Mid-Tower",
+    "QuantityOnStock": 31,
+    "Price": 2183.35,
+    "Category": 7,
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 100,
+    "Manufacturer": "Kingston",
+    "Model": "947W 80\u002B Gold",
+    "QuantityOnStock": 40,
+    "Price": 18013.63,
+    "Category": 6,
+    "PatternComponents": []
+  },
+  {
+    "ComponentId": 101,
+    "Manufacturer": "Gigabyte",
+    "Model": "Arc A770",
+    "QuantityOnStock": 44,
+    "Price": 2946.26,
+    "Category": 0,
+    "PatternComponents": []
+  }
+]

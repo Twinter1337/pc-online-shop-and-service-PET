@@ -1,4 +1,6 @@
-﻿namespace ComputerAssemblyServiceBackEnd.Models;
+﻿using System.Xml.Serialization;
+
+namespace ComputerAssemblyServiceBackEnd.Models;
 
 public partial class Employee
 {
@@ -14,8 +16,10 @@ public partial class Employee
 
     public DateOnly HireDate { get; set; }
 
+    [XmlIgnore]
     public virtual ICollection<ComputerOnService> ComputersOnService { get; set; } = new List<ComputerOnService>();
 
+    [XmlIgnore]
     public virtual ICollection<OrderService> OrderServices { get; set; } = new List<OrderService>();
 
     public virtual EmployeePosition PositionNavigation { get; set; } = null!;
